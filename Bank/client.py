@@ -12,7 +12,7 @@ class client():
 
     def menu_input(self):
         commands = [
-            ("BC","1"),
+            ("BC",self.Bank_Code),
             ("AC","2"),
             ("AD","3"),
             ("AW","4"),
@@ -26,11 +26,11 @@ class client():
         try:
             while (choosen_com == None):
                 choosen_com = self.get_input()
-                code = choosen_com[:2]
+                split_input = choosen_com.split(maxsplit=1)
                 try:
                     num = 0
                     for i,comand in commands:
-                        if(code == i):
+                        if(split_input[0] == i):
                             break
                         num += 1
                     if (num == len(commands)):
@@ -43,8 +43,7 @@ class client():
         except ConnectionAbortedError:
             pass
         else:
-            print(commands[num][0])
-            #return commands[choosen_com - 1][1]()   
+            return commands[num][1](split_input[1] if len(split_input) > 1 else None)   
 
     def send_message(self,message,newline = True):
         if(newline):
@@ -54,7 +53,6 @@ class client():
         self.connection.send(message_as_bytes)
 
     def get_input(self):
-        #why ?????????????
         buffer = b""
 
         while True:
@@ -64,3 +62,9 @@ class client():
             if buffer.endswith(b"\r\n"):
                 message = buffer.decode("utf-8")
                 return message.strip()
+            
+    def Bank_Code(self,parametrs = None):
+        if not parametrs:
+            self.send_message(f"BC {self.server_ip}")
+        else:
+            self.send_message("ER Příkaz má mít formát: BC")
