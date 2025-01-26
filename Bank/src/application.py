@@ -64,12 +64,12 @@ class application():
     def Account_remove(self,parametrs):
         if(self.Check_parametrs(parametrs,"AR <account>/<ip>")):
             split_parametrs = parametrs.split("/",maxsplit=1)
-            balance = read_row_csv(split_parametrs[0])
+            balance = self.table_DAO.Read_balance(split_parametrs[0])
             if(balance == None):
                 return self.client.send_message("ER Účet neexistuje")
-            if(int(balance)>0):
-                return self.client.send_message("ER Účet nelze smazat protože není prázdný")
-            delete_accoun(split_parametrs[0])
+            if(balance>0):
+                return self.client.send_message("ER Účet nelze smazat protože obsahuje zůstatek")
+            self.table_DAO.Delete(split_parametrs[0])
             self.client.send_message(f"AR")
     
     def Bank_amount(self,parametrs):
