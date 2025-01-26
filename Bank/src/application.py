@@ -1,12 +1,14 @@
 import random
 from src.Account.AccountDAO import AccountDAO
 from src.Account.Account import Account
+from src.logging import log
 
 class application():
     def __init__(self,client):
         self.client = client
         self.table_DAO = AccountDAO(self)
     
+    @log
     def Account_create(self,parametrs = None):
         if(parametrs):
             return self.client.send_message("ER Příkaz má mít formát: AC")
@@ -21,8 +23,9 @@ class application():
         else:
             a = Account(new_account,0)
             self.table_DAO.Save(a)
-            self.client.send_message(f"AC {new_account}/{self.client.server_ip}")
+            return self.client.send_message(f"AC {new_account}/{self.client.server_ip}")
 
+    @log
     def Account_deposit(self,parametrs):
         if(self.Check_parametrs(parametrs,"AD <account>/<ip> <number>",True)):
             split_parametrs = parametrs.split("/",maxsplit=1)
@@ -35,8 +38,9 @@ class application():
                return self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
             a.Balance += int(split_split_parametrs[1])
             self.table_DAO.Update(a)
-            self.client.send_message(f"AD")
+            return self.client.send_message(f"AD")
     
+    @log
     def Account_withdrawal(self,parametrs):
         if(self.Check_parametrs(parametrs,"AW <account>/<ip> <number>",True)):
             split_parametrs = parametrs.split("/",maxsplit=1)
@@ -49,16 +53,18 @@ class application():
                return self.client.send_message("ER Částka na účtu nemůže být negativní")
             a.Balance -= int(split_split_parametrs[1])
             self.table_DAO.Update(a)
-            self.client.send_message(f"AW")
+            return self.client.send_message(f"AW")
 
+    @log
     def Account_balance(self,parametrs):
         if(self.Check_parametrs(parametrs,"AB <account>/<ip>")):
             split_parametrs = parametrs.split("/",maxsplit=1)
             balance = self.table_DAO.Read_balance(split_parametrs[0])
             if(balance == None):
                 return self.client.send_message("ER Účet neexistuje")
-            self.client.send_message(f"AB {balance}")
+            return self.client.send_message(f"AB {balance}")
 
+    @log
     def Account_remove(self,parametrs):
         if(self.Check_parametrs(parametrs,"AR <account>/<ip>")):
             split_parametrs = parametrs.split("/",maxsplit=1)
@@ -68,19 +74,21 @@ class application():
             if(balance>0):
                 return self.client.send_message("ER Účet nelze smazat protože obsahuje zůstatek")
             self.table_DAO.Delete(split_parametrs[0])
-            self.client.send_message(f"AR")
+            return self.client.send_message(f"AR")
     
+    @log
     def Bank_amount(self,parametrs):
         if(parametrs):
             return self.client.send_message("ER Příkaz má mít formát: BA")
         
-        self.client.send_message(f"BA {self.table_DAO.Read_Bank_amount()}")
+        return self.client.send_message(f"BA {self.table_DAO.Read_Bank_amount()}")
 
+    @log
     def Bank_number(self,parametrs):
         if(parametrs):
             return self.client.send_message("ER Příkaz má mít formát: BN")
         
-        self.client.send_message(f"BN {self.table_DAO.Read_Bank_number()}")
+        return self.client.send_message(f"BN {self.table_DAO.Read_Bank_number()}")
         
     def Check_parametrs(self,parametrs,format,amount = False):
         if(not parametrs):
