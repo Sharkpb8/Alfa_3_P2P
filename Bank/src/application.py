@@ -82,9 +82,7 @@ class application():
         if(parametrs):
             return self.client.send_message("ER Příkaz má mít formát: BN")
         
-        if(not os.path.isfile("./Bank/Accounts.csv")):
-            create_csv()
-        self.client.send_message(f"BN {number_of_clients()}")
+        self.client.send_message(f"BN {self.table_DAO.Read_Bank_number()}")
         
     def Check_parametrs(self,parametrs,format,amount = False):
         if(not parametrs):

@@ -105,3 +105,19 @@ class AccountDAO:
         finally:
             DatabaseSingleton.close_conn()
             return amount
+        
+    def Read_Bank_number(self):
+        sql = "SELECT * FROM Bank_number;"
+        conn = DatabaseSingleton()
+        cursor = conn.cursor()
+        amount = 0
+        try:
+            cursor.execute(sql)
+            myresult = cursor.fetchall()
+        except Exception as e:
+            print(e)
+        else:
+            amount = myresult[0][0]   
+        finally:
+            DatabaseSingleton.close_conn()
+            return amount

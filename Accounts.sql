@@ -12,3 +12,9 @@ create view Bank_amount
 as
 select sum(balance)
 from Accounts; //
+
+delimiter //
+create view Bank_number
+as
+select count(account_number)
+from Accounts; //
