@@ -15,7 +15,7 @@ class client():
         commands = [
             ("BC",self.Bank_Code),
             ("AC",self.application.Account_create),
-            ("AD","3"),
+            ("AD",self.application.Account_deposit),
             ("AW","4"),
             ("AB",self.application.Account_balance),
             ("AR","6"),

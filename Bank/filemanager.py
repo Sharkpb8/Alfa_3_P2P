@@ -29,3 +29,18 @@ def read_row_csv(account_number):
             if(rows[0] == account_number):
                 data = rows[1]
         return data
+
+def update_balance(account_number, balance):
+    contents = []
+    with open("./Bank/Accounts.csv","r", newline='') as f_read:
+        csvread = csv.reader(f_read)
+        for rows in csvread:
+            if(rows[0] == account_number):
+                data = [rows[0],balance]
+            else:
+                data = [rows[0],rows[1]]
+            contents.append(data)
+    with open("./Bank/Accounts.csv","w",newline='') as f_write:
+        csvwriter = csv.writer(f_write)
+        for i in contents:
+            csvwriter.writerow(i)

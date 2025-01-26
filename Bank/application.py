@@ -23,25 +23,63 @@ class application():
         else:
             save_csv(new_account,0)
             self.client.send_message(f"AC {new_account}/{self.client.server_ip}")
-            
+
+    def Account_deposit(self,parametrs):
+        if(self.Check_parametrs(parametrs,"AD <account>/<ip> <number>",True)):
+            split_parametrs = parametrs.split("/",maxsplit=1)
+            balance = int(read_row_csv(split_parametrs[0]))
+            if(balance == None):
+                print(balance)
+                return self.client.send_message("ER Účet neexistuje")
+            split_split_parametrs = split_parametrs[1].split(maxsplit=1)
+            if(balance+int(split_split_parametrs[1]>(2**63)-1)):
+               return self.client.send_message("ER Částka na účtu nemůže bát větší než (2**63)-1")
+            balance += int(split_split_parametrs[1])
+            update_balance(split_parametrs[0],balance)
+            self.client.send_message(f"AD")
     
     def Account_balance(self,parametrs):
+        if(self.Check_parametrs(parametrs,"AB <account>/<ip>")):
+            split_parametrs = parametrs.split("/",maxsplit=1)
+            balance = read_row_csv(split_parametrs[0])
+            if(not balance):
+                return self.client.send_message("ER Účet neexistuje")
+            self.client.send_message(f"AB {balance}")
+        
+    def Check_parametrs(self,parametrs,format,ammount = False):
         if(not parametrs):
-            return self.client.send_message("ER Příkaz má mít formát: AB <account>/<ip>")
+            self.client.send_message(f"ER Příkaz má mít formát: {format}")
+            return False
         if(not os.path.isfile("./Bank/Accounts.csv")):
-            return self.client.send_message("ER Účet neexistuje")
+            self.client.send_message("ER Účet neexistuje")
+            return False
         split_parametrs = parametrs.split("/",maxsplit=1)
         if(len(split_parametrs) != 2):
-            return self.client.send_message("ER Příkaz má mít formát: AB <account>/<ip>")
-        balance = read_row_csv(split_parametrs[0])
-        if(not balance):
-            return self.client.send_message("ER Účet neexistuje")
-        if(self.is_invalid_ipv4(split_parametrs[1])):
-            return self.client.send_message("ER Špatná formát ip addresy")
-        if(split_parametrs[1] != self.client.server_ip):
-            return self.client.send_message("Není implementovaný")
-        self.client.send_message(f"AB {balance}")
-        
+            self.client.send_message(f"ER Příkaz má mít formát: {format}")
+            return False
+        if(ammount):
+            split_split_parametrs = split_parametrs[1].split(maxsplit=1)
+            if(self.is_invalid_ipv4(split_split_parametrs[0])):
+                self.client.send_message("ER Špatný formát ip addresy")
+                return False
+            if(split_split_parametrs[0] != self.client.server_ip):
+                self.client.send_message("Není implementovaný")
+                return False
+            try:
+                number = int(split_split_parametrs[1])
+                if(number<0):
+                    return False
+            except ValueError:
+                return False
+        else:
+            if(self.is_invalid_ipv4(split_parametrs[1])):
+                self.client.send_message("ER Špatný formát ip addresy")
+                return False
+            if(split_parametrs[1] != self.client.server_ip):
+                self.client.send_message("Není implementovaný")
+                return False
+        return True
+
     def is_invalid_ipv4(self,ip):
         parts = ip.split(".")
         if (len(parts) != 4):
