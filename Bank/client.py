@@ -1,9 +1,10 @@
-
+from application import application
 
 class client():
 
     def __init__(self,connection,server_ip):
         self.connection = connection
+        self.application = application(self)
         self.server_ip = server_ip
 
     def run(self):
