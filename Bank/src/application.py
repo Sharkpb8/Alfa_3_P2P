@@ -76,9 +76,7 @@ class application():
         if(parametrs):
             return self.client.send_message("ER Příkaz má mít formát: BA")
         
-        if(not os.path.isfile("./Bank/Accounts.csv")):
-            create_csv()
-        self.client.send_message(f"BA {total_balance()}")
+        self.client.send_message(f"BA {self.table_DAO.Read_Bank_amount()}")
 
     def Bank_number(self,parametrs):
         if(parametrs):
@@ -88,7 +86,7 @@ class application():
             create_csv()
         self.client.send_message(f"BN {number_of_clients()}")
         
-    def Check_parametrs(self,parametrs,format,ammount = False):
+    def Check_parametrs(self,parametrs,format,amount = False):
         if(not parametrs):
             self.client.send_message(f"ER Příkaz má mít formát: {format}")
             return False
@@ -96,7 +94,7 @@ class application():
         if(len(split_parametrs) != 2):
             self.client.send_message(f"ER Příkaz má mít formát: {format}")
             return False
-        if(ammount):
+        if(amount):
             split_split_parametrs = split_parametrs[1].split(maxsplit=1)
             if(self.is_invalid_ipv4(split_split_parametrs[0])):
                 self.client.send_message("ER Špatný formát ip addresy")
