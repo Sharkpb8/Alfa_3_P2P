@@ -28,15 +28,15 @@ class application():
     def Account_deposit(self,parametrs):
         if(self.Check_parametrs(parametrs,"AD <account>/<ip> <number>",True)):
             split_parametrs = parametrs.split("/",maxsplit=1)
-            balance = read_row_csv(split_parametrs[0])
-            if(balance == None):
+            a = Account(split_parametrs[0],0)
+            a.Balance = self.table_DAO.Read_balance(a.Account_number)
+            if(a.Balance == None):
                 return self.client.send_message("ER Účet neexistuje")
-            balance = int(balance)
             split_split_parametrs = split_parametrs[1].split(maxsplit=1)
-            if((balance+int(split_split_parametrs[1]))>(2**63)-1):
+            if((a.Balance+int(split_split_parametrs[1]))>(2**63)-1):
                return self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
-            balance += int(split_split_parametrs[1])
-            update_balance(split_parametrs[0],balance)
+            a.Balance += int(split_split_parametrs[1])
+            self.table_DAO.Update(a)
             self.client.send_message(f"AD")
     
     def Account_withdrawal(self,parametrs):
@@ -91,9 +91,6 @@ class application():
     def Check_parametrs(self,parametrs,format,ammount = False):
         if(not parametrs):
             self.client.send_message(f"ER Příkaz má mít formát: {format}")
-            return False
-        if(not os.path.isfile("./Bank/Accounts.csv")):
-            self.client.send_message("ER Účet neexistuje")
             return False
         split_parametrs = parametrs.split("/",maxsplit=1)
         if(len(split_parametrs) != 2):

@@ -23,8 +23,8 @@ class AccountDAO:
             DatabaseSingleton.close_conn()
 
     def Update(self,a):
-        sql = "UPDATE Accounts SET account_number = %s, balance = %s WHERE account_number = %s;"
-        val = [a.Account_number, a.Balance]
+        sql = "UPDATE Accounts SET balance = %s WHERE account_number = %s;"
+        val = [a.Balance, a.Account_number]
         conn = DatabaseSingleton()
         cursor = conn.cursor()
         try:
@@ -59,17 +59,17 @@ class AccountDAO:
         val = [Account_number]
         conn = DatabaseSingleton()
         cursor = conn.cursor()
+        balance = None
         try:
             cursor.execute(sql,val)
             myresult = cursor.fetchall()
         except Exception as e:
             print(e)
         else:
-            for i in myresult:
-                a = Account(i[0])        
+            balance = myresult[0][0]      
         finally:
             DatabaseSingleton.close_conn()
-            return a
+            return balance
         
     def Read_account_number(self):
         sql = "SELECT account_number FROM Accounts;"
