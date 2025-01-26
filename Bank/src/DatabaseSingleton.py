@@ -28,7 +28,7 @@ class DatabaseSingleton:
 
     @classmethod
     def readconfig(cls,key):
-        with open("./appconfig.json","r") as f:
+        with open("./Bank/appconfig.json","r") as f:
             config = json.load(f)
             return config["database"][key]
 

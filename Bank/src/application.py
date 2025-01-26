@@ -1,27 +1,28 @@
-from filemanager import *
+from src.filemanager import *
 import os
 import random
+from src.Account.AccountDAO import AccountDAO
+from src.Account.Account import Account
 
 class application():
     def __init__(self,client):
         self.client = client
+        self.table_DAO = AccountDAO(self)
     
     def Account_create(self,parametrs = None):
         if(parametrs):
             return self.client.send_message("ER Příkaz má mít formát: AC")
         
-        if(not os.path.isfile("./Bank/Accounts.csv")):
-            create_csv()
-        contents = read_csv()
-        existing_accounts = []
-        for i in contents:
-            existing_accounts.append(i[0])
+        existing_accounts = self.table_DAO.Read_account_number()
+        if(not existing_accounts):
+            existing_accounts = []
         try:
             new_account = random.choice([i for i in range(10000,100000) if i not in existing_accounts])
         except IndexError:
-            self.client.send_message("ER Již nelze vytvořit učty")
+            self.client.send_message("ER Již nelze vytvořit účty")
         else:
-            save_csv(new_account,0)
+            a = Account(new_account,0)
+            self.table_DAO.Save(a)
             self.client.send_message(f"AC {new_account}/{self.client.server_ip}")
 
     def Account_deposit(self,parametrs):

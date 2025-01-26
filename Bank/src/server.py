@@ -1,6 +1,6 @@
 import socket
 import threading
-from client import client
+from src.client import client
 
 class server:
 
