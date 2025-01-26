@@ -1,5 +1,5 @@
 import socket
-import threading
+import multiprocessing
 from src.client import client
 
 class server:
@@ -19,8 +19,8 @@ class server:
         while True:
             try:
                 connection, client_inet_address = self.server_socket.accept()
-                thread = threading.Thread(target=self.create_new_client,args=(connection,self,))
-                thread.start()
+                process = multiprocessing.Process(target=self.create_new_client,args=(connection,self,))
+                process.start()
             except OSError:
                 break
             except ConnectionAbortedError:
