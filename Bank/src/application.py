@@ -56,7 +56,7 @@ class application():
     def Account_balance(self,parametrs):
         if(self.Check_parametrs(parametrs,"AB <account>/<ip>")):
             split_parametrs = parametrs.split("/",maxsplit=1)
-            balance = read_row_csv(split_parametrs[0])
+            balance = self.table_DAO.Read_balance(split_parametrs[0])
             if(balance == None):
                 return self.client.send_message("ER Účet neexistuje")
             self.client.send_message(f"AB {balance}")
