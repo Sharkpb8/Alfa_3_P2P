@@ -1,5 +1,3 @@
-from src.filemanager import *
-import os
 import random
 from src.Account.AccountDAO import AccountDAO
 from src.Account.Account import Account
