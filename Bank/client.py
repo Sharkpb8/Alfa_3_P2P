@@ -17,7 +17,7 @@ class client():
             ("AC",self.application.Account_create),
             ("AD","3"),
             ("AW","4"),
-            ("AB","5"),
+            ("AB",self.application.Account_balance),
             ("AR","6"),
             ("BA","7"),
             ("BN","8"),

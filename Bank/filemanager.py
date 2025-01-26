@@ -20,3 +20,12 @@ def read_csv():
             data = [rows[0],rows[1]]
             contents.append(data)
         return contents
+    
+def read_row_csv(account_number):
+    with open("./Bank/Accounts.csv","r") as file:
+        csvwriter = csv.reader(file)
+        data = None
+        for rows in csvwriter:
+            if(rows[0] == account_number):
+                data = rows[1]
+        return data
