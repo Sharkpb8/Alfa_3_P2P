@@ -70,6 +70,22 @@ class application():
                 return self.client.send_message("ER Účet nelze smazat protože není prázdný")
             delete_accoun(split_parametrs[0])
             self.client.send_message(f"AR")
+    
+    def Bank_amount(self,parametrs):
+        if(parametrs):
+            return self.client.send_message("ER Příkaz má mít formát: BA")
+        
+        if(not os.path.isfile("./Bank/Accounts.csv")):
+            create_csv()
+        self.client.send_message(f"BA {total_balance()}")
+
+    def Bank_number(self,parametrs):
+        if(parametrs):
+            return self.client.send_message("ER Příkaz má mít formát: BN")
+        
+        if(not os.path.isfile("./Bank/Accounts.csv")):
+            create_csv()
+        self.client.send_message(f"BN {number_of_clients()}")
         
     def Check_parametrs(self,parametrs,format,ammount = False):
         if(not parametrs):

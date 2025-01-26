@@ -19,8 +19,8 @@ class client():
             ("AW",self.application.Account_withdrawal),
             ("AB",self.application.Account_balance),
             ("AR",self.application.Account_remove),
-            ("BA","7"),
-            ("BN","8"),
+            ("BA",self.application.Bank_amount),
+            ("BN",self.application.Bank_number),
         ]
 
         choosen_com = None

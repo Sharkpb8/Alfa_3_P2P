@@ -57,3 +57,21 @@ def delete_accoun(account_number):
         csvwriter = csv.writer(f_write)
         for i in contents:
             csvwriter.writerow(i)
+
+def total_balance():
+    balance = 0
+    with open("./Bank/Accounts.csv","r") as file:
+        csvreader = csv.reader(file)
+        next(csvreader)
+        for rows in csvreader:
+            balance += int(rows[1])
+        return balance
+
+def number_of_clients():
+    ammount = 0
+    with open("./Bank/Accounts.csv","r") as file:
+        csvreader = csv.reader(file)
+        next(csvreader)
+        for rows in csvreader:
+            ammount += 1
+        return ammount
