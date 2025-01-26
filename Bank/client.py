@@ -16,7 +16,7 @@ class client():
             ("BC",self.Bank_Code),
             ("AC",self.application.Account_create),
             ("AD",self.application.Account_deposit),
-            ("AW","4"),
+            ("AW",self.application.Account_withdrawal),
             ("AB",self.application.Account_balance),
             ("AR","6"),
             ("BA","7"),

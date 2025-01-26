@@ -32,12 +32,26 @@ class application():
                 print(balance)
                 return self.client.send_message("ER Účet neexistuje")
             split_split_parametrs = split_parametrs[1].split(maxsplit=1)
-            if(balance+int(split_split_parametrs[1]>(2**63)-1)):
-               return self.client.send_message("ER Částka na účtu nemůže bát větší než (2**63)-1")
+            if((balance+int(split_split_parametrs[1]))>(2**63)-1):
+               return self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
             balance += int(split_split_parametrs[1])
             update_balance(split_parametrs[0],balance)
             self.client.send_message(f"AD")
     
+    def Account_withdrawal(self,parametrs):
+        if(self.Check_parametrs(parametrs,"AD <account>/<ip> <number>",True)):
+            split_parametrs = parametrs.split("/",maxsplit=1)
+            balance = int(read_row_csv(split_parametrs[0]))
+            if(balance == None):
+                print(balance)
+                return self.client.send_message("ER Účet neexistuje")
+            split_split_parametrs = split_parametrs[1].split(maxsplit=1)
+            if((balance-int(split_split_parametrs[1]))<0):
+               return self.client.send_message("ER Částka na účtu nemůže být negativní")
+            balance -= int(split_split_parametrs[1])
+            update_balance(split_parametrs[0],balance)
+            self.client.send_message(f"AW")
+
     def Account_balance(self,parametrs):
         if(self.Check_parametrs(parametrs,"AB <account>/<ip>")):
             split_parametrs = parametrs.split("/",maxsplit=1)
