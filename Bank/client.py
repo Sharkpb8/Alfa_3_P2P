@@ -14,7 +14,7 @@ class client():
     def menu_input(self):
         commands = [
             ("BC",self.Bank_Code),
-            ("AC","2"),
+            ("AC",self.application.Account_create),
             ("AD","3"),
             ("AW","4"),
             ("AB","5"),
