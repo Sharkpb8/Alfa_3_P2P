@@ -27,10 +27,10 @@ class application():
     def Account_deposit(self,parametrs):
         if(self.Check_parametrs(parametrs,"AD <account>/<ip> <number>",True)):
             split_parametrs = parametrs.split("/",maxsplit=1)
-            balance = int(read_row_csv(split_parametrs[0]))
+            balance = read_row_csv(split_parametrs[0])
             if(balance == None):
-                print(balance)
                 return self.client.send_message("ER Účet neexistuje")
+            balance = int(balance)
             split_split_parametrs = split_parametrs[1].split(maxsplit=1)
             if((balance+int(split_split_parametrs[1]))>(2**63)-1):
                return self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
@@ -39,12 +39,12 @@ class application():
             self.client.send_message(f"AD")
     
     def Account_withdrawal(self,parametrs):
-        if(self.Check_parametrs(parametrs,"AD <account>/<ip> <number>",True)):
+        if(self.Check_parametrs(parametrs,"AW <account>/<ip> <number>",True)):
             split_parametrs = parametrs.split("/",maxsplit=1)
-            balance = int(read_row_csv(split_parametrs[0]))
+            balance = read_row_csv(split_parametrs[0])
             if(balance == None):
-                print(balance)
                 return self.client.send_message("ER Účet neexistuje")
+            balance = int(balance)
             split_split_parametrs = split_parametrs[1].split(maxsplit=1)
             if((balance-int(split_split_parametrs[1]))<0):
                return self.client.send_message("ER Částka na účtu nemůže být negativní")
@@ -56,9 +56,20 @@ class application():
         if(self.Check_parametrs(parametrs,"AB <account>/<ip>")):
             split_parametrs = parametrs.split("/",maxsplit=1)
             balance = read_row_csv(split_parametrs[0])
-            if(not balance):
+            if(balance == None):
                 return self.client.send_message("ER Účet neexistuje")
             self.client.send_message(f"AB {balance}")
+
+    def Account_remove(self,parametrs):
+        if(self.Check_parametrs(parametrs,"AR <account>/<ip>")):
+            split_parametrs = parametrs.split("/",maxsplit=1)
+            balance = read_row_csv(split_parametrs[0])
+            if(balance == None):
+                return self.client.send_message("ER Účet neexistuje")
+            if(int(balance)>0):
+                return self.client.send_message("ER Účet nelze smazat protože není prázdný")
+            delete_accoun(split_parametrs[0])
+            self.client.send_message(f"AR")
         
     def Check_parametrs(self,parametrs,format,ammount = False):
         if(not parametrs):

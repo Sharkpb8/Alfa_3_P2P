@@ -18,7 +18,7 @@ class client():
             ("AD",self.application.Account_deposit),
             ("AW",self.application.Account_withdrawal),
             ("AB",self.application.Account_balance),
-            ("AR","6"),
+            ("AR",self.application.Account_remove),
             ("BA","7"),
             ("BN","8"),
         ]
