@@ -72,7 +72,7 @@ class AccountDAO:
             return a
         
     def Read_account_number(self):
-        sql = "SELECT account_number FROM Accounts where account_number = %s;"
+        sql = "SELECT account_number FROM Accounts;"
         conn = DatabaseSingleton()
         cursor = conn.cursor()
         data = []
