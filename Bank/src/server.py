@@ -11,7 +11,7 @@ class server:
         server_socket.listen()
 
         self.server_socket = server_socket
-        self.server_ip = "127.0.0.1"
+        self.server_ip = server_inet_address[0]
 
         print("Server start on "+str(server_inet_address[0])+":"+str(server_inet_address[1]))
 
