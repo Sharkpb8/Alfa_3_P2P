@@ -12,6 +12,7 @@ class server:
         port = self.readconfig("port")
         if(self.is_invalid_port(port)):
             port = "65525"
+        port = int(port)
         server_inet_address = (ip, port)
         server_socket = socket.socket()
         server_socket.bind(server_inet_address)
@@ -26,16 +27,18 @@ class server:
         while True:
             try:
                 connection, client_inet_address = self.server_socket.accept()
-                process = multiprocessing.Process(target=self.create_new_client,args=(connection,self,))
+                process = multiprocessing.Process(target=self.create_new_client,args=(connection,self,client_inet_address,))
                 process.start()
+                print(f"Client connected on {client_inet_address[0]}")
             except OSError:
                 break
             except ConnectionAbortedError:
                 break
     
-    def create_new_client(self,connection,server):
+    def create_new_client(self,connection,client_inet_address):
         c = client(connection,self.server_ip)
         c.run()
+        print(f"Client connected on {client_inet_address[0]}")
 
     def readconfig(self,key):
         with open("./Bank/config.json","r") as f:
