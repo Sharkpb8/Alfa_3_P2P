@@ -2,10 +2,11 @@ from src.application import application
 
 class client():
 
-    def __init__(self,connection,server_ip):
+    def __init__(self,connection,server_ip,client_ip):
         self.connection = connection
         self.application = application(self)
         self.server_ip = server_ip
+        self.client_ip = client_ip
 
     def run(self):
         while True:
