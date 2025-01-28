@@ -30,9 +30,9 @@ class application():
     def Account_deposit(self,parametrs):
         account,ip,number = self.parse_parametrs(parametrs)
         try:
-            self.Check_parametrs(account,ip,number,"AD <account>/<ip> <number>")
-        except Exception as e:
-            print(e)
+            self.Check_parametrs(account,ip,number)
+        except ParametrError:
+            self.client.send_message(f"ER Příkaz má mít formát: AD <account>/<ip> <number>")
         else:
             a = Account(account,0)
             a.Balance = self.table_DAO.Read_balance(a.Account_number)
@@ -48,9 +48,9 @@ class application():
     def Account_withdrawal(self,parametrs):
         account,ip,number = self.parse_parametrs(parametrs)
         try:
-            self.Check_parametrs(account,ip,number,"AW <account>/<ip> <number>")
-        except Exception as e:
-            print(e)
+            self.Check_parametrs(account,ip,number)
+        except ParametrError:
+            self.client.send_message(f"ER Příkaz má mít formát: AW <account>/<ip> <number>")
         else:
             a = Account(account,0)
             a.Balance = self.table_DAO.Read_balance(a.Account_number)
@@ -68,9 +68,9 @@ class application():
         try:
             if(number):
                 number = None
-            self.Check_parametrs(account,ip,number,"AB <account>/<ip>")
-        except Exception as e:
-            print(e)
+            self.Check_parametrs(account,ip,number)
+        except ParametrError:
+            self.client.send_message(f"ER Příkaz má mít formát: AB <account>/<ip>")
         else:
             balance = self.table_DAO.Read_balance(account)
             if(balance == None):
@@ -83,9 +83,9 @@ class application():
         try:
             if(number):
                 number = None
-            self.Check_parametrs(account,ip,number,"AR <account>/<ip>")
-        except Exception as e:
-            print(e)
+            self.Check_parametrs(account,ip,number)
+        except ParametrError:
+            self.client.send_message(f"ER Příkaz má mít formát: AR <account>/<ip>")
         else:
             balance = self.table_DAO.Read_balance(account)
             if(balance == None):
@@ -109,10 +109,9 @@ class application():
         
         return self.client.send_message(f"BN {self.table_DAO.Read_Bank_number()}")
         
-    def Check_parametrs(self,account,ip,number,format):
+    def Check_parametrs(self,account,ip,number):
         if(not (account and ip and number)):
-            self.client.send_message(f"ER Příkaz má mít formát: {format}")
-            return False
+            raise ParametrError
         if(self.is_invalid_ipv4(ip)):
             self.client.send_message("ER Špatný formát ip addresy")
             return False
