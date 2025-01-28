@@ -10,3 +10,5 @@ class NegativeBalanceError(Exception):
     pass
 class NumberLimitError(Exception):
     pass
+class AccountRemovalError(Exception):
+    pass

@@ -90,16 +90,18 @@ class application():
             if(number):
                 number = None
             self.Check_parametrs(account,ip,number)
+            balance = self.table_DAO.Read_balance(account)
+            if(balance == None):
+                raise AccountDoestnExistError
         except ParametrsError:
             self.client.send_message(f"ER Příkaz má mít formát: AB <account>/<ip>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
         except NotImplementedError:
             self.client.send_message("Není implementovaný")
+        except AccountDoestnExistError:
+            self.client.send_message("ER Účet neexistuje")
         else:
-            balance = self.table_DAO.Read_balance(account)
-            if(balance == None):
-                return self.client.send_message("ER Účet neexistuje")
             return self.client.send_message(f"AB {balance}")
 
     @log
@@ -109,18 +111,22 @@ class application():
             if(number):
                 number = None
             self.Check_parametrs(account,ip,number)
+            balance = self.table_DAO.Read_balance(account)
+            if(balance == None):
+                raise AccountDoestnExistError
+            if(balance>0):
+                raise AccountRemovalError
         except ParametrsError:
             self.client.send_message(f"ER Příkaz má mít formát: AR <account>/<ip>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
         except NotImplementedError:
             self.client.send_message("Není implementovaný")
+        except AccountDoestnExistError:
+            self.client.send_message("ER Účet neexistuje")
+        except AccountRemovalError:
+            self.client.send_message("ER Účet nelze smazat protože obsahuje zůstatek")
         else:
-            balance = self.table_DAO.Read_balance(account)
-            if(balance == None):
-                return self.client.send_message("ER Účet neexistuje")
-            if(balance>0):
-                return self.client.send_message("ER Účet nelze smazat protože obsahuje zůstatek")
             self.table_DAO.Delete(account)
             return self.client.send_message(f"AR")
     
