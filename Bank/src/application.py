@@ -2,6 +2,7 @@ import random
 from src.Account.AccountDAO import AccountDAO
 from src.Account.Account import Account
 from src.logging import log
+from src.error import *
 
 class application():
     def __init__(self,client):
