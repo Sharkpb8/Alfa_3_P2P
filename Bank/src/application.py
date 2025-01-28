@@ -11,14 +11,15 @@ class application():
     
     @log
     def Account_create(self,parametrs = None):
-        if(parametrs):
-            return self.client.send_message("ER Příkaz má mít formát: AC")
-        
-        existing_accounts = self.table_DAO.Read_account_number()
-        if(not existing_accounts):
-            existing_accounts = []
         try:
+            if(parametrs):
+                raise ParametrsError
+            existing_accounts = self.table_DAO.Read_account_number()
+            if(not existing_accounts):
+                existing_accounts = []
             new_account = random.choice([i for i in range(10000,100000) if i not in existing_accounts])
+        except ParametrsError:
+            self.client.send_message("ER Příkaz má mít formát: AC")
         except IndexError:
             self.client.send_message("ER Již nelze vytvořit účty")
         else:
@@ -35,6 +36,8 @@ class application():
             self.client.send_message(f"ER Příkaz má mít formát: AD <account>/<ip> <number>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
+        except NotImplementedError:
+            self.client.send_message("Není implementovaný")
         else:
             a = Account(account,0)
             a.Balance = self.table_DAO.Read_balance(a.Account_number)
@@ -55,6 +58,8 @@ class application():
             self.client.send_message(f"ER Příkaz má mít formát: AW <account>/<ip> <number>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
+        except NotImplementedError:
+            self.client.send_message("Není implementovaný")
         else:
             a = Account(account,0)
             a.Balance = self.table_DAO.Read_balance(a.Account_number)
@@ -77,6 +82,8 @@ class application():
             self.client.send_message(f"ER Příkaz má mít formát: AB <account>/<ip>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
+        except NotImplementedError:
+            self.client.send_message("Není implementovaný")
         else:
             balance = self.table_DAO.Read_balance(account)
             if(balance == None):
@@ -94,6 +101,8 @@ class application():
             self.client.send_message(f"ER Příkaz má mít formát: AR <account>/<ip>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
+        except NotImplementedError:
+            self.client.send_message("Není implementovaný")
         else:
             balance = self.table_DAO.Read_balance(account)
             if(balance == None):
@@ -105,17 +114,23 @@ class application():
     
     @log
     def Bank_amount(self,parametrs):
-        if(parametrs):
-            return self.client.send_message("ER Příkaz má mít formát: BA")
-        
-        return self.client.send_message(f"BA {self.table_DAO.Read_Bank_amount()}")
+        try:
+            if(parametrs):
+                raise ParametrsError
+        except ParametrsError:
+            self.client.send_message("ER Příkaz má mít formát: BA")
+        else:
+            self.client.send_message(f"BA {self.table_DAO.Read_Bank_amount()}")
 
     @log
     def Bank_number(self,parametrs):
-        if(parametrs):
-            return self.client.send_message("ER Příkaz má mít formát: BN")
-        
-        return self.client.send_message(f"BN {self.table_DAO.Read_Bank_number()}")
+        try:
+            if(parametrs):
+                raise ParametrsError
+        except ParametrsError:
+            self.client.send_message("ER Příkaz má mít formát: BN")
+        else:
+            self.client.send_message(f"BN {self.table_DAO.Read_Bank_number()}")
         
     def Check_parametrs(self,account,ip,number):
         if(not (account and ip and number)):
@@ -123,8 +138,7 @@ class application():
         if(self.is_invalid_ipv4(ip)):
             raise IpV4Error
         if(ip != self.client.server_ip):
-            self.client.send_message("Není implementovaný")
-            return False
+            raise NotImplementedError
         try:
             number = int(number)
             if(number<0):
