@@ -32,20 +32,26 @@ class application():
         account,ip,number = self.parse_parametrs(parametrs)
         try:
             self.Check_parametrs(account,ip,number)
+            a = Account(account,0)
+            a.Balance = self.table_DAO.Read_balance(a.Account_number)
+            if(a.Balance == None):
+                raise AccountDoestnExistError
+            if((a.Balance+int(number))>(2**63)-1):
+                raise NumberLimitError
+            a.Balance += int(number)
         except ParametrsError:
             self.client.send_message(f"ER Příkaz má mít formát: AD <account>/<ip> <number>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
         except NotImplementedError:
             self.client.send_message("Není implementovaný")
+        except NumberError:
+            self.client.send_message("ER number musí být nezáporný číslo")
+        except AccountDoestnExistError:
+            self.client.send_message("ER Účet neexistuje")
+        except NumberLimitError:
+            self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
         else:
-            a = Account(account,0)
-            a.Balance = self.table_DAO.Read_balance(a.Account_number)
-            if(a.Balance == None):
-                return self.client.send_message("ER Účet neexistuje")
-            if((a.Balance+int(number))>(2**63)-1):
-                return self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
-            a.Balance += int(number)
             self.table_DAO.Update(a)
             return self.client.send_message(f"AD")
     
@@ -54,20 +60,26 @@ class application():
         account,ip,number = self.parse_parametrs(parametrs)
         try:
             self.Check_parametrs(account,ip,number)
+            a = Account(account,0)
+            a.Balance = self.table_DAO.Read_balance(a.Account_number)
+            if(a.Balance == None):
+                raise AccountDoestnExistError
+            if((a.Balance-int(number))<0):
+                raise NegativeBalanceError
+            a.Balance -= int(number)
         except ParametrsError:
             self.client.send_message(f"ER Příkaz má mít formát: AW <account>/<ip> <number>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
         except NotImplementedError:
             self.client.send_message("Není implementovaný")
+        except NumberError:
+            self.client.send_message("ER number musí být nezáporný číslo")
+        except AccountDoestnExistError:
+            self.client.send_message("ER Účet neexistuje")
+        except NegativeBalanceError:
+            self.client.send_message("ER Částka na účtu nemůže být negativní")
         else:
-            a = Account(account,0)
-            a.Balance = self.table_DAO.Read_balance(a.Account_number)
-            if(a.Balance == None):
-                return self.client.send_message("ER Účet neexistuje")
-            if((a.Balance-int(number))<0):
-                return self.client.send_message("ER Částka na účtu nemůže být negativní")
-            a.Balance -= int(number)
             self.table_DAO.Update(a)
             return self.client.send_message(f"AW")
 
@@ -132,20 +144,17 @@ class application():
         else:
             self.client.send_message(f"BN {self.table_DAO.Read_Bank_number()}")
         
-    def Check_parametrs(self,account,ip,number):
+    def Check_parametrs(self,account,ip,number = 2):
         if(not (account and ip and number)):
             raise ParametrsError
         if(self.is_invalid_ipv4(ip)):
             raise IpV4Error
         if(ip != self.client.server_ip):
             raise NotImplementedError
-        try:
-            number = int(number)
-            if(number<0):
-                return False
-        except ValueError:
-            return False
-        return True
+        if(not number.isdigit()):
+            raise NumberError
+        if(int(number)<0):
+            raise NumberError
 
     def is_invalid_ipv4(self,ip):
         parts = ip.split(".")
