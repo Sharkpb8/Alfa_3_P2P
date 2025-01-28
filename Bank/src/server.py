@@ -66,8 +66,6 @@ class server:
             num = int(port)
             if num < 65525 or num > 65535:
                 return True
-            if len(port) > 1 and port[0] == "0":    
-                return True
         except ValueError:
             return True
         else:
