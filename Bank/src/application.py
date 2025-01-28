@@ -33,52 +33,66 @@ class application():
             self.Check_parametrs(account,ip,number,"AD <account>/<ip> <number>")
         except Exception as e:
             print(e)
-        a = Account(account,0)
-        a.Balance = self.table_DAO.Read_balance(a.Account_number)
-        if(a.Balance == None):
-            return self.client.send_message("ER Účet neexistuje")
-        if((a.Balance+int(number))>(2**63)-1):
-            return self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
-        a.Balance += int(number)
-        self.table_DAO.Update(a)
-        return self.client.send_message(f"AD")
-    
-    @log
-    def Account_withdrawal(self,parametrs):
-        if(self.Check_parametrs(parametrs,"AW <account>/<ip> <number>",True)):
-            split_parametrs = parametrs.split("/",maxsplit=1)
-            a = Account(split_parametrs[0],0)
+        else:
+            a = Account(account,0)
             a.Balance = self.table_DAO.Read_balance(a.Account_number)
             if(a.Balance == None):
                 return self.client.send_message("ER Účet neexistuje")
-            split_split_parametrs = split_parametrs[1].split(maxsplit=1)
-            if((a.Balance-int(split_split_parametrs[1]))<0):
-               return self.client.send_message("ER Částka na účtu nemůže být negativní")
-            a.Balance -= int(split_split_parametrs[1])
+            if((a.Balance+int(number))>(2**63)-1):
+                return self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
+            a.Balance += int(number)
+            self.table_DAO.Update(a)
+            return self.client.send_message(f"AD")
+    
+    @log
+    def Account_withdrawal(self,parametrs):
+        account,ip,number = self.parse_parametrs(parametrs)
+        try:
+            self.Check_parametrs(account,ip,number,"AW <account>/<ip> <number>")
+        except Exception as e:
+            print(e)
+        else:
+            a = Account(account,0)
+            a.Balance = self.table_DAO.Read_balance(a.Account_number)
+            if(a.Balance == None):
+                return self.client.send_message("ER Účet neexistuje")
+            if((a.Balance-int(number))<0):
+                return self.client.send_message("ER Částka na účtu nemůže být negativní")
+            a.Balance -= int(number)
             self.table_DAO.Update(a)
             return self.client.send_message(f"AW")
 
     @log
     def Account_balance(self,parametrs):
-        #set number to None
-        if(self.Check_parametrs(parametrs,"AB <account>/<ip>")):
-            split_parametrs = parametrs.split("/",maxsplit=1)
-            balance = self.table_DAO.Read_balance(split_parametrs[0])
+        account,ip,number = self.parse_parametrs(parametrs)
+        try:
+            if(number):
+                number = None
+            self.Check_parametrs(account,ip,number,"AB <account>/<ip>")
+        except Exception as e:
+            print(e)
+        else:
+            balance = self.table_DAO.Read_balance(account)
             if(balance == None):
                 return self.client.send_message("ER Účet neexistuje")
             return self.client.send_message(f"AB {balance}")
 
     @log
     def Account_remove(self,parametrs):
-        #set number to None
-        if(self.Check_parametrs(parametrs,"AR <account>/<ip>")):
-            split_parametrs = parametrs.split("/",maxsplit=1)
-            balance = self.table_DAO.Read_balance(split_parametrs[0])
+        account,ip,number = self.parse_parametrs(parametrs)
+        try:
+            if(number):
+                number = None
+            self.Check_parametrs(account,ip,number,"AR <account>/<ip>")
+        except Exception as e:
+            print(e)
+        else:
+            balance = self.table_DAO.Read_balance(account)
             if(balance == None):
                 return self.client.send_message("ER Účet neexistuje")
             if(balance>0):
                 return self.client.send_message("ER Účet nelze smazat protože obsahuje zůstatek")
-            self.table_DAO.Delete(split_parametrs[0])
+            self.table_DAO.Delete(account)
             return self.client.send_message(f"AR")
     
     @log
