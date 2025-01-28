@@ -27,7 +27,7 @@ class server:
         while True:
             try:
                 connection, client_inet_address = self.server_socket.accept()
-                process = multiprocessing.Process(target=self.create_new_client,args=(connection,self,client_inet_address,))
+                process = multiprocessing.Process(target=self.create_new_client,args=(connection,client_inet_address,))
                 process.start()
                 print(f"Client connected on {client_inet_address[0]}")
             except OSError:

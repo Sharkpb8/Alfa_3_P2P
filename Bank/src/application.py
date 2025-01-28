@@ -28,18 +28,20 @@ class application():
 
     @log
     def Account_deposit(self,parametrs):
-        if(self.Check_parametrs(parametrs,"AD <account>/<ip> <number>",True)):
-            split_parametrs = parametrs.split("/",maxsplit=1)
-            a = Account(split_parametrs[0],0)
-            a.Balance = self.table_DAO.Read_balance(a.Account_number)
-            if(a.Balance == None):
-                return self.client.send_message("ER Účet neexistuje")
-            split_split_parametrs = split_parametrs[1].split(maxsplit=1)
-            if((a.Balance+int(split_split_parametrs[1]))>(2**63)-1):
-               return self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
-            a.Balance += int(split_split_parametrs[1])
-            self.table_DAO.Update(a)
-            return self.client.send_message(f"AD")
+        account,ip,number = self.parse_parametrs(parametrs)
+        try:
+            self.Check_parametrs(account,ip,number,"AD <account>/<ip> <number>")
+        except Exception as e:
+            print(e)
+        a = Account(account,0)
+        a.Balance = self.table_DAO.Read_balance(a.Account_number)
+        if(a.Balance == None):
+            return self.client.send_message("ER Účet neexistuje")
+        if((a.Balance+int(number))>(2**63)-1):
+            return self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
+        a.Balance += int(number)
+        self.table_DAO.Update(a)
+        return self.client.send_message(f"AD")
     
     @log
     def Account_withdrawal(self,parametrs):
@@ -58,6 +60,7 @@ class application():
 
     @log
     def Account_balance(self,parametrs):
+        #set number to None
         if(self.Check_parametrs(parametrs,"AB <account>/<ip>")):
             split_parametrs = parametrs.split("/",maxsplit=1)
             balance = self.table_DAO.Read_balance(split_parametrs[0])
@@ -67,6 +70,7 @@ class application():
 
     @log
     def Account_remove(self,parametrs):
+        #set number to None
         if(self.Check_parametrs(parametrs,"AR <account>/<ip>")):
             split_parametrs = parametrs.split("/",maxsplit=1)
             balance = self.table_DAO.Read_balance(split_parametrs[0])
@@ -91,35 +95,22 @@ class application():
         
         return self.client.send_message(f"BN {self.table_DAO.Read_Bank_number()}")
         
-    def Check_parametrs(self,parametrs,format,amount = False):
-        if(not parametrs):
+    def Check_parametrs(self,account,ip,number,format):
+        if(not (account and ip and number)):
             self.client.send_message(f"ER Příkaz má mít formát: {format}")
             return False
-        split_parametrs = parametrs.split("/",maxsplit=1)
-        if(len(split_parametrs) != 2):
-            self.client.send_message(f"ER Příkaz má mít formát: {format}")
+        if(self.is_invalid_ipv4(ip)):
+            self.client.send_message("ER Špatný formát ip addresy")
             return False
-        if(amount):
-            split_split_parametrs = split_parametrs[1].split(maxsplit=1)
-            if(self.is_invalid_ipv4(split_split_parametrs[0])):
-                self.client.send_message("ER Špatný formát ip addresy")
+        if(ip != self.client.server_ip):
+            self.client.send_message("Není implementovaný")
+            return False
+        try:
+            number = int(number)
+            if(number<0):
                 return False
-            if(split_split_parametrs[0] != self.client.server_ip):
-                self.client.send_message("Není implementovaný")
-                return False
-            try:
-                number = int(split_split_parametrs[1])
-                if(number<0):
-                    return False
-            except ValueError:
-                return False
-        else:
-            if(self.is_invalid_ipv4(split_parametrs[1])):
-                self.client.send_message("ER Špatný formát ip addresy")
-                return False
-            if(split_parametrs[1] != self.client.server_ip):
-                self.client.send_message("Není implementovaný")
-                return False
+        except ValueError:
+            return False
         return True
 
     def is_invalid_ipv4(self,ip):
@@ -138,3 +129,19 @@ class application():
         else:
             return False
         
+    def parse_parametrs(self,parametrs):
+        split_parametrs = parametrs.split("/",maxsplit=1)
+        split_split_parametrs = split_parametrs[1].split(maxsplit=1)
+        try:
+            account = split_parametrs[0]
+        except IndexError:
+            account = None
+        try:
+            ip = split_split_parametrs[0]
+        except IndexError:
+            ip= None
+        try:
+            number = split_split_parametrs[1]
+        except IndexError:
+            number = None
+        return account,ip,number
