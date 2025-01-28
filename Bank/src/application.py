@@ -207,20 +207,26 @@ class application():
     
     def forward_command(self,account,ip,number):
         try:
-            try:
-                for i in range(65525,65536):
+            for i in range(65525,65536):
+                try:
                     server_inet_address = (ip, i)
                     remote_socket = socket.socket()
                     remote_socket.bind(server_inet_address)
                     remote_socket.listen()
-            except:
-                print(i)
-                pass
-        except:
-            print("xd")
+                    remote_socket.connect((ip, i))
+                    break
+                except socket.error:
+                    print(i)
+                    pass
+            else:
+                return None
+        except Exception as e:
+            print(e)
+            return None
         else:
             command = f"{account}/{ip} {"" if number is None else number}"
             remote_socket.sendall(command.encode("utf-8"))
 
             response = remote_socket.recv(4096).decode()
+            remote_socket.close()
             return response
