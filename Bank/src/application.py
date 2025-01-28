@@ -3,6 +3,7 @@ from src.Account.AccountDAO import AccountDAO
 from src.Account.Account import Account
 from src.logging import log
 from src.error import *
+import socket
 
 class application():
     def __init__(self,client):
@@ -100,7 +101,8 @@ class application():
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
         except NotImplementedError:
-            self.client.send_message("Není implementovaný")
+            response = self.forward_command(account,ip,number)
+            return self.client.send_message(f"{response}")
         except AccountDoestnExistError:
             self.client.send_message("ER Účet neexistuje")
         else:
@@ -202,3 +204,23 @@ class application():
             except IndexError:
                 number = None
             return account,ip,number
+    
+    def forward_command(self,account,ip,number):
+        try:
+            try:
+                for i in range(65525,65536):
+                    server_inet_address = (ip, i)
+                    remote_socket = socket.socket()
+                    remote_socket.bind(server_inet_address)
+                    remote_socket.listen()
+            except:
+                print(i)
+                pass
+        except:
+            print("xd")
+        else:
+            command = f"{account}/{ip} {"" if number is None else number}"
+            remote_socket.sendall(command.encode("utf-8"))
+
+            response = remote_socket.recv(4096).decode()
+            return response
