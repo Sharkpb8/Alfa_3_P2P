@@ -179,18 +179,22 @@ class application():
             return False
         
     def parse_parametrs(self,parametrs):
-        split_parametrs = parametrs.split("/",maxsplit=1)
-        split_split_parametrs = split_parametrs[1].split(maxsplit=1)
         try:
-            account = split_parametrs[0]
+            split_parametrs = parametrs.split("/",maxsplit=1)
+            split_split_parametrs = split_parametrs[1].split(maxsplit=1)
         except IndexError:
-            account = None
-        try:
-            ip = split_split_parametrs[0]
-        except IndexError:
-            ip= None
-        try:
-            number = split_split_parametrs[1]
-        except IndexError:
-            number = None
-        return account,ip,number
+            return None,None,None
+        else:
+            try:
+                account = split_parametrs[0]
+            except IndexError:
+                account = None
+            try:
+                ip = split_split_parametrs[0]
+            except IndexError:
+                ip= None
+            try:
+                number = split_split_parametrs[1]
+            except IndexError:
+                number = None
+            return account,ip,number
