@@ -1,4 +1,4 @@
 class IpV4Error(Exception):
     pass
-class ParametrError(Exception):
+class ParametrsError(Exception):
     pass

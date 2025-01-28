@@ -31,8 +31,10 @@ class application():
         account,ip,number = self.parse_parametrs(parametrs)
         try:
             self.Check_parametrs(account,ip,number)
-        except ParametrError:
+        except ParametrsError:
             self.client.send_message(f"ER Příkaz má mít formát: AD <account>/<ip> <number>")
+        except IpV4Error:
+            self.client.send_message("ER Špatný formát ip addresy")
         else:
             a = Account(account,0)
             a.Balance = self.table_DAO.Read_balance(a.Account_number)
@@ -49,8 +51,10 @@ class application():
         account,ip,number = self.parse_parametrs(parametrs)
         try:
             self.Check_parametrs(account,ip,number)
-        except ParametrError:
+        except ParametrsError:
             self.client.send_message(f"ER Příkaz má mít formát: AW <account>/<ip> <number>")
+        except IpV4Error:
+            self.client.send_message("ER Špatný formát ip addresy")
         else:
             a = Account(account,0)
             a.Balance = self.table_DAO.Read_balance(a.Account_number)
@@ -69,8 +73,10 @@ class application():
             if(number):
                 number = None
             self.Check_parametrs(account,ip,number)
-        except ParametrError:
+        except ParametrsError:
             self.client.send_message(f"ER Příkaz má mít formát: AB <account>/<ip>")
+        except IpV4Error:
+            self.client.send_message("ER Špatný formát ip addresy")
         else:
             balance = self.table_DAO.Read_balance(account)
             if(balance == None):
@@ -84,8 +90,10 @@ class application():
             if(number):
                 number = None
             self.Check_parametrs(account,ip,number)
-        except ParametrError:
+        except ParametrsError:
             self.client.send_message(f"ER Příkaz má mít formát: AR <account>/<ip>")
+        except IpV4Error:
+            self.client.send_message("ER Špatný formát ip addresy")
         else:
             balance = self.table_DAO.Read_balance(account)
             if(balance == None):
@@ -111,10 +119,9 @@ class application():
         
     def Check_parametrs(self,account,ip,number):
         if(not (account and ip and number)):
-            raise ParametrError
+            raise ParametrsError
         if(self.is_invalid_ipv4(ip)):
-            self.client.send_message("ER Špatný formát ip addresy")
-            return False
+            raise IpV4Error
         if(ip != self.client.server_ip):
             self.client.send_message("Není implementovaný")
             return False
