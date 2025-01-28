@@ -1,5 +1,6 @@
 {
     "ip":"127.0.0.1",
     "port":65530,
-    "time_out":"1"
+    "server_time_out":5,
+    "client_time_out":5
 }

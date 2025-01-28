@@ -12,11 +12,17 @@ class server:
         port = self.readconfig("port")
         if(self.is_invalid_port(port)):
             port = "65525"
+        # timeout = self.readconfig("server_time_out")
+        # try:
+        #     timeout = float(timeout)
+        # except ValueError:
+        #     timeout = 5
         port = int(port)
         server_inet_address = (ip, port)
         server_socket = socket.socket()
         server_socket.bind(server_inet_address)
         server_socket.listen()
+        # server_socket.settimeout(timeout)
 
         self.server_socket = server_socket
         self.server_ip = ip
@@ -27,6 +33,12 @@ class server:
         while True:
             try:
                 connection, client_inet_address = self.server_socket.accept()
+                timeout = self.readconfig("client_time_out")
+                try:
+                    timeout = float(timeout)
+                except ValueError:
+                    timeout = 5
+                connection.settimeout(timeout)   
                 process = multiprocessing.Process(target=self.create_new_client,args=(connection,client_inet_address,))
                 process.start()
                 print(f"Client connected on {client_inet_address[0]}")
@@ -36,9 +48,13 @@ class server:
                 break
     
     def create_new_client(self,connection,client_inet_address):
-        c = client(connection,self.server_ip,client_inet_address[0])
-        c.run()
-        print(f"Client connected on {client_inet_address[0]}")
+        try:
+            c = client(connection,self.server_ip,client_inet_address[0])
+            c.run()
+        except socket.timeout:
+            connection.close()
+        finally:
+            print(f"Client with address {client_inet_address[0]} disconnected")
 
     def readconfig(self,key):
         with open("./Bank/config.json","r") as f:
