@@ -215,7 +215,6 @@ class application():
             return account,ip,number
     
     def forward_command(self,account,ip,number,code):
-        # TODO \n\r in response
         try:
             for i in range(65525,65536):
                 try:
@@ -235,6 +234,6 @@ class application():
             print(command)
             remote_socket.sendall(command.encode("utf-8"))
 
-            response = remote_socket.recv(4096).decode()
+            response = remote_socket.recv(4096).decode().strip()
             remote_socket.close()
             return response
