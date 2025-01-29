@@ -90,9 +90,7 @@ class application():
         try:
             if(number):
                 number = None
-            else:
-                number = "2" 
-            self.Check_parametrs(account,ip,number)
+            self.Check_parametrs(account,ip,number,False)
             balance = self.table_DAO.Read_balance(account)
             if(balance == None):
                 raise AccountDoestnExistError
@@ -114,9 +112,7 @@ class application():
         try:
             if(number):
                 number = None
-            else:
-                number = "2"
-            self.Check_parametrs(account,ip,number)
+            self.Check_parametrs(account,ip,number,False)
             balance = self.table_DAO.Read_balance(account)
             if(balance == None):
                 raise AccountDoestnExistError
@@ -156,17 +152,22 @@ class application():
         else:
             self.client.send_message(f"BN {self.table_DAO.Read_Bank_number()}")
         
-    def Check_parametrs(self,account,ip,number):
-        if(not (account and ip and number)):
-            raise ParametrsError
+    def Check_parametrs(self,account,ip,number,check_number = True):
+        if(check_number):
+            if(not (account and ip and number)):
+                raise ParametrsError
+        else:
+            if(not (account and ip)):
+                raise ParametrsError
         if(self.is_invalid_ipv4(ip)):
             raise IpV4Error
         if(ip != self.client.server_ip):
             raise NotImplementedError
-        if(not number.isdigit()):
-            raise NumberError
-        if(int(number)<0):
-            raise NumberError
+        if(check_number):
+            if(not number.isdigit()):
+                raise NumberError
+            if(int(number)<0):
+                raise NumberError
 
     def is_invalid_ipv4(self,ip):
         parts = ip.split(".")
