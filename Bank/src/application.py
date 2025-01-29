@@ -101,7 +101,7 @@ class application():
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
         except NotImplementedError:
-            response = self.forward_command(account,ip,number)
+            response = self.forward_command(account,ip,number,"AB")
             return self.client.send_message(f"{response}")
         except AccountDoestnExistError:
             self.client.send_message("ER Účet neexistuje")
@@ -205,14 +205,12 @@ class application():
                 number = None
             return account,ip,number
     
-    def forward_command(self,account,ip,number):
+    def forward_command(self,account,ip,number,code):
         try:
             for i in range(65525,65536):
                 try:
                     server_inet_address = (ip, i)
-                    remote_socket = socket.socket()
-                    remote_socket.bind(server_inet_address)
-                    remote_socket.listen()
+                    remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     remote_socket.connect((ip, i))
                     break
                 except socket.error:
@@ -224,7 +222,8 @@ class application():
             print(e)
             return None
         else:
-            command = f"{account}/{ip} {"" if number is None else number}"
+            command = f"{code} {account}/{ip} {'' if number is None else number}\r\n"
+            print(command)
             remote_socket.sendall(command.encode("utf-8"))
 
             response = remote_socket.recv(4096).decode()
