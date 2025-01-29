@@ -37,9 +37,11 @@ class server:
     
     def create_new_client(self,connection,client_inet_address):
         # TODO disconect when using forward
-        c = client(connection,self.server_ip,client_inet_address[0])
-        c.run()
-        print(f"Client connected on {client_inet_address[0]}")
+        try:
+            c = client(connection,self.server_ip,client_inet_address[0])
+            c.run()
+        finally:
+            print(f"Client with address {client_inet_address[0]} disconnected")
 
     def readconfig(self,key):
         with open("./Bank/config.json","r") as f:
