@@ -44,8 +44,10 @@ class application():
             self.client.send_message(f"ER Příkaz má mít formát: AD <account>/<ip> <number>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
-        except NotImplementedError:
+        except NotServerIpError:
             response = self.forward_command(account,ip,number,"AD")
+            if(not response):
+                return self.client.send_message(f"ER S bankou na {ip} se nepodařilo spojit")
             return self.client.send_message(f"{response}")
         except NumberError:
             self.client.send_message("ER number musí být nezáporný číslo")
@@ -73,8 +75,10 @@ class application():
             self.client.send_message(f"ER Příkaz má mít formát: AW <account>/<ip> <number>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
-        except NotImplementedError:
+        except NotServerIpError:
             response = self.forward_command(account,ip,number,"AW")
+            if(not response):
+                return self.client.send_message(f"ER S bankou na {ip} se nepodařilo spojit")
             return self.client.send_message(f"{response}")
         except NumberError:
             self.client.send_message("ER number musí být nezáporný číslo")
@@ -100,8 +104,10 @@ class application():
             self.client.send_message(f"ER Příkaz má mít formát: AB <account>/<ip>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
-        except NotImplementedError:
+        except NotServerIpError:
             response = self.forward_command(account,ip,number,"AB")
+            if(not response):
+                return self.client.send_message(f"ER S bankou na {ip} se nepodařilo spojit")
             return self.client.send_message(f"{response}")
         except AccountDoestnExistError:
             self.client.send_message("ER Účet neexistuje")
@@ -124,8 +130,6 @@ class application():
             self.client.send_message(f"ER Příkaz má mít formát: AR <account>/<ip>")
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
-        except NotImplementedError:
-            self.client.send_message("Není implementovaný")
         except AccountDoestnExistError:
             self.client.send_message("ER Účet neexistuje")
         except AccountRemovalError:
@@ -164,7 +168,7 @@ class application():
         if(self.is_invalid_ipv4(ip)):
             raise IpV4Error
         if(ip != self.client.server_ip):
-            raise NotImplementedError
+            raise NotServerIpError
         if(check_number):
             if(not number.isdigit()):
                 raise NumberError
@@ -193,6 +197,8 @@ class application():
             split_split_parametrs = split_parametrs[1].split(maxsplit=1)
         except IndexError:
             return None,None,None
+        except AttributeError:
+            return None,None,None
         else:
             try:
                 account = split_parametrs[0]
@@ -209,20 +215,20 @@ class application():
             return account,ip,number
     
     def forward_command(self,account,ip,number,code):
+        # TODO \n\r in response
         try:
             for i in range(65525,65536):
                 try:
                     server_inet_address = (ip, i)
                     remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    remote_socket.connect((ip, i))
+                    remote_socket.connect(server_inet_address)
                     break
                 except socket.error:
                     print(i)
                     pass
             else:
-                return None
-        except Exception as e:
-            print(e)
+                raise socket.error
+        except socket.error:
             return None
         else:
             command = f"{code} {account}/{ip} {'' if number is None else number}\r\n"

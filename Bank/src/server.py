@@ -36,6 +36,7 @@ class server:
                 break
     
     def create_new_client(self,connection,client_inet_address):
+        # TODO disconect when using forward
         c = client(connection,self.server_ip,client_inet_address[0])
         c.run()
         print(f"Client connected on {client_inet_address[0]}")

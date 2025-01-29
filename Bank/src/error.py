@@ -12,3 +12,5 @@ class NumberLimitError(Exception):
     pass
 class AccountRemovalError(Exception):
     pass
+class NotServerIpError(Exception):
+    pass
