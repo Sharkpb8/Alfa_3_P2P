@@ -45,7 +45,8 @@ class application():
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
         except NotImplementedError:
-            self.client.send_message("Není implementovaný")
+            response = self.forward_command(account,ip,number,"AD")
+            return self.client.send_message(f"{response}")
         except NumberError:
             self.client.send_message("ER number musí být nezáporný číslo")
         except AccountDoestnExistError:
@@ -73,7 +74,8 @@ class application():
         except IpV4Error:
             self.client.send_message("ER Špatný formát ip addresy")
         except NotImplementedError:
-            self.client.send_message("Není implementovaný")
+            response = self.forward_command(account,ip,number,"AW")
+            return self.client.send_message(f"{response}")
         except NumberError:
             self.client.send_message("ER number musí být nezáporný číslo")
         except AccountDoestnExistError:
