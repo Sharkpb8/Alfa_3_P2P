@@ -18,6 +18,13 @@ class server:
         server_socket.bind(server_inet_address)
         server_socket.listen()
 
+        timeout = self.readconfig("server_time_out")
+        try:
+            timeout = float(timeout)
+        except ValueError:
+            timeout = 5
+        server_socket.settimeout(timeout)
+
         self.server_socket = server_socket
         self.server_ip = ip
 
@@ -30,13 +37,14 @@ class server:
                 process = multiprocessing.Process(target=self.create_new_client,args=(connection,client_inet_address,))
                 process.start()
                 print(f"Client connected on {client_inet_address[0]}")
+            except socket.timeout:
+                continue
             except OSError:
                 break
             except ConnectionAbortedError:
                 break
     
     def create_new_client(self,connection,client_inet_address):
-        # TODO disconect when using forward
         try:
             c = client(connection,self.server_ip,client_inet_address[0])
             c.run()
