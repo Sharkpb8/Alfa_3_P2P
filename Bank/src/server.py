@@ -12,17 +12,17 @@ class server:
         port = self.readconfig("port")
         if(self.is_invalid_port(port)):
             port = "65525"
-        # timeout = self.readconfig("server_time_out")
-        # try:
-        #     timeout = float(timeout)
-        # except ValueError:
-        #     timeout = 5
+        timeout = self.readconfig("server_time_out")
+        try:
+            timeout = float(timeout)
+        except ValueError:
+            timeout = 5
         port = int(port)
         server_inet_address = (ip, port)
         server_socket = socket.socket()
         server_socket.bind(server_inet_address)
         server_socket.listen()
-        # server_socket.settimeout(timeout)
+        server_socket.settimeout(timeout)
 
         self.server_socket = server_socket
         self.server_ip = ip
@@ -42,6 +42,9 @@ class server:
                 process = multiprocessing.Process(target=self.create_new_client,args=(connection,client_inet_address,))
                 process.start()
                 print(f"Client connected on {client_inet_address[0]}")
+            except socket.timeout:  # Zpracování timeoutu na serveru při čekání na klienta
+                print("Server accept timeout expired")
+                continue
             except OSError:
                 break
             except ConnectionAbortedError:
@@ -52,6 +55,10 @@ class server:
             c = client(connection,self.server_ip,client_inet_address[0])
             c.run()
         except socket.timeout:
+            print(f"Connection timeout for client {client_inet_address[0]}")
+            connection.close()
+        except Exception as e:
+            print(f"Error while handling client {client_inet_address[0]}: {e}")
             connection.close()
         finally:
             print(f"Client with address {client_inet_address[0]} disconnected")
