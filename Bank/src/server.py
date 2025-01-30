@@ -101,5 +101,7 @@ class server:
                 connection.sendall(b"\x00")
             except ConnectionAbortedError:
                 break
+            except ConnectionResetError:
+                break
         connection.close()
         print(f"Client with address {client_inet_address[0]} disconnected")
