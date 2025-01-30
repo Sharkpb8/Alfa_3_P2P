@@ -16,7 +16,7 @@ class RobberyPlan():
     def scan_network(self,process_id,addresses):
         connections = []
         x_start = (256 * process_id) // self.total_processes
-        x_end = (256 * (process_id + 1)) // self.total_processes
+        x_end = (256 * (process_id + 1)) // self.total_processes-1
         try:
             for i in range(65525,65536):
                 for x in range(x_start,x_end):

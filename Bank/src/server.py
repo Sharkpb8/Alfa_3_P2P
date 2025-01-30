@@ -90,11 +90,6 @@ class server:
     
     def is_alive(self,connection,client_inet_address):
         timeout = self.readconfig("client_time_out")
-        # try:
-        #     timeout = float(timeout)
-        # except ValueError:
-        #     timeout = 5
-        # connection.settimeout(timeout)
         while True:
             try:
                 time.sleep(timeout)
