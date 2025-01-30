@@ -232,7 +232,6 @@ class application():
             return None
         else:
             command = f"{code} {account}/{ip} {'' if number is None else number}\r\n"
-            print(command)
             remote_socket.sendall(command.encode("utf-8"))
 
             response = remote_socket.recv(4096).decode().strip()
