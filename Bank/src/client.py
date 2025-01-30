@@ -22,6 +22,7 @@ class client():
             ("AR",self.application.Account_remove),
             ("BA",self.application.Bank_amount),
             ("BN",self.application.Bank_number),
+            ("RP",self.application.Robbery_plan)
         ]
 
         choosen_com = None

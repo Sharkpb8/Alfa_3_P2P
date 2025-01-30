@@ -4,6 +4,7 @@ from src.Account.Account import Account
 from src.logging import log
 from src.error import *
 import socket
+from src.RobberyPlan import RobberyPlan
 
 class application():
     def __init__(self,client):
@@ -157,6 +158,20 @@ class application():
             self.client.send_message("ER Příkaz má mít formát: BN")
         else:
             self.client.send_message(f"BN {self.table_DAO.Read_Bank_number()}")
+
+    @log
+    def Robbery_plan(self,parametrs):
+        try:
+            if(not parametrs):
+                raise ParametrsError
+            if(not parametrs.isdigit()):
+                raise ParametrsError
+        except ParametrsError:
+            self.client.send_message("ER Příkaz má mít formát: RP <number>")
+        else:
+            rp = RobberyPlan(self.client.server_ip)
+            addresses = rp.available_servers()
+            rp.banks_info(addresses)
         
     def Check_parametrs(self,account,ip,number,check_number = True):
         if(check_number):
