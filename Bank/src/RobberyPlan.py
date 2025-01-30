@@ -101,7 +101,7 @@ class RobberyPlan():
         for server in best_combo:
             banks += " "+server[0]
 
-        return f"K dosažení {target} je třeba vyloupit banky 10.1.2.3 a 10.1.2.85 a bude poškozeno jen {best_clients} klientů."
+        return f"K dosažení {target} je třeba vyloupit banky {banks} a bude poškozeno jen {best_clients} klientů."
 
     def readconfig(self,key):
         with open("./Bank/config.json","r") as f:
