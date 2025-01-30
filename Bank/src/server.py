@@ -1,5 +1,5 @@
+import multiprocessing.process
 import socket
-import multiprocessing
 from src.client import client
 import json
 
@@ -24,6 +24,13 @@ class server:
         server_socket.listen()
         server_socket.settimeout(timeout)
 
+        timeout = self.readconfig("server_time_out")
+        try:
+            timeout = float(timeout)
+        except ValueError:
+            timeout = 5
+        server_socket.settimeout(timeout)
+
         self.server_socket = server_socket
         self.server_ip = ip
 
@@ -33,17 +40,12 @@ class server:
         while True:
             try:
                 connection, client_inet_address = self.server_socket.accept()
-                timeout = self.readconfig("client_time_out")
-                try:
-                    timeout = float(timeout)
-                except ValueError:
-                    timeout = 5
-                connection.settimeout(timeout)   
-                process = multiprocessing.Process(target=self.create_new_client,args=(connection,client_inet_address,))
-                process.start()
+                process_client = multiprocessing.Process(target=self.create_new_client,args=(connection,client_inet_address,))
+                process_client.start()
+                process_alive = multiprocessing.Process(target=self.is_alive,args=(connection,client_inet_address,))
+                process_alive.start()
                 print(f"Client connected on {client_inet_address[0]}")
-            except socket.timeout:  # Zpracování timeoutu na serveru při čekání na klienta
-                print("Server accept timeout expired")
+            except socket.timeout:
                 continue
             except OSError:
                 break
@@ -51,17 +53,8 @@ class server:
                 break
     
     def create_new_client(self,connection,client_inet_address):
-        try:
-            c = client(connection,self.server_ip,client_inet_address[0])
-            c.run()
-        except socket.timeout:
-            print(f"Connection timeout for client {client_inet_address[0]}")
-            connection.close()
-        except Exception as e:
-            print(f"Error while handling client {client_inet_address[0]}: {e}")
-            connection.close()
-        finally:
-            print(f"Client with address {client_inet_address[0]} disconnected")
+        c = client(connection,self.server_ip,client_inet_address[0])
+        c.run()
 
     def readconfig(self,key):
         with open("./Bank/config.json","r") as f:
@@ -93,3 +86,19 @@ class server:
             return True
         else:
             return False
+    
+    def is_alive(self,connection,client_inet_address):
+        timeout = self.readconfig("client_time_out")
+        try:
+            timeout = float(timeout)
+        except ValueError:
+            timeout = 5
+        connection.settimeout(timeout)
+        while True:
+            try:
+                connection.sendall(b"\x00")
+            except (BrokenPipeError, ConnectionResetError):
+                break
+        connection.close()
+        print(f"Client with address {client_inet_address[0]} disconnected")
+        print(connection)
