@@ -2,6 +2,7 @@ import multiprocessing.process
 import socket
 from src.client import client
 import json
+import time
 
 class server:
 
@@ -89,16 +90,16 @@ class server:
     
     def is_alive(self,connection,client_inet_address):
         timeout = self.readconfig("client_time_out")
-        try:
-            timeout = float(timeout)
-        except ValueError:
-            timeout = 5
-        connection.settimeout(timeout)
+        # try:
+        #     timeout = float(timeout)
+        # except ValueError:
+        #     timeout = 5
+        # connection.settimeout(timeout)
         while True:
             try:
+                time.sleep(timeout)
                 connection.sendall(b"\x00")
-            except (BrokenPipeError, ConnectionResetError):
+            except ConnectionAbortedError:
                 break
         connection.close()
         print(f"Client with address {client_inet_address[0]} disconnected")
-        print(connection)
