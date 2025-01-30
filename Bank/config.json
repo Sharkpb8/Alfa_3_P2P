@@ -4,5 +4,5 @@
     "server_time_out":5,
     "client_time_out":5,
     "scan_processes":10,
-    "scan_time_out":0.1
+    "scan_time_out":0.01
 }

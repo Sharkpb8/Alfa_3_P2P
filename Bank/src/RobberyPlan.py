@@ -2,6 +2,7 @@ import socket
 import multiprocessing
 import time
 import json
+from itertools import combinations
 
 class RobberyPlan():
 
@@ -77,8 +78,30 @@ class RobberyPlan():
                 data.append(BN_response)
                 result.append(data)
                 remote_socket.close()
-        for i in result:
-            print(i)
+        return result
+
+    def best_combination(self,banks, target):
+        print(banks)
+        best_sum = float('inf')
+        best_combo = []
+        best_clients = float('inf')
+        
+        for r in range(1, len(banks) + 1):
+            for combo in combinations(banks, r):
+                total_money = sum(int(server[1].split()[1]) for server in combo)
+                total_clients = sum(int(server[2].split()[1]) for server in combo)
+                
+                if (abs(target - total_money) < abs(target - best_sum)) or \
+                (abs(target - total_money) == abs(target - best_sum) and total_clients < best_clients):
+                    best_sum = total_money
+                    best_clients = total_clients
+                    best_combo = combo
+        
+        banks = ""
+        for server in best_combo:
+            banks += " "+server[0]
+
+        return f"K dosažení {target} je třeba vyloupit banky 10.1.2.3 a 10.1.2.85 a bude poškozeno jen {best_clients} klientů."
 
     def readconfig(self,key):
         with open("./Bank/config.json","r") as f:

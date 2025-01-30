@@ -171,7 +171,9 @@ class application():
         else:
             rp = RobberyPlan(self.client.server_ip)
             addresses = rp.available_servers()
-            rp.banks_info(addresses)
+            banks = rp.banks_info(addresses)
+            result = rp.best_combination(banks,int(parametrs))
+            self.client.send_message(result)
         
     def Check_parametrs(self,account,ip,number,check_number = True):
         if(check_number):
