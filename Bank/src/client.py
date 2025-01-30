@@ -9,6 +9,7 @@ class client():
         self.client_ip = client_ip
 
     def run(self):
+        self.send_message("Byly jste úspěšně připojeni")
         while True:
             self.menu_input()
 
