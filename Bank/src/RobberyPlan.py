@@ -86,20 +86,23 @@ class RobberyPlan():
         best_combo = []
         best_clients = float('inf')
         
-        for r in range(1, len(banks) + 1):
-            for combo in combinations(banks, r):
-                total_money = sum(int(server[1].split()[1]) for server in combo)
-                total_clients = sum(int(server[2].split()[1]) for server in combo)
+        for i in range(1, len(banks) + 1):
+            for combo in combinations(banks, i):
+                total_money = sum(int(bank[1].split()[1]) for bank in combo)
+                total_clients = sum(int(bank[2].split()[1]) for bank in combo)
                 
-                if (abs(target - total_money) < abs(target - best_sum)) or \
-                (abs(target - total_money) == abs(target - best_sum) and total_clients < best_clients):
+                if ((abs(target - total_money) < abs(target - best_sum)) or (abs(target - total_money) == abs(target - best_sum) and total_clients < best_clients)):
+                    if(best_sum == target):
+                        break
                     best_sum = total_money
                     best_clients = total_clients
                     best_combo = combo
+            if(best_sum == target):
+                break
         
         banks = ""
-        for server in best_combo:
-            banks += " "+server[0]
+        for bank in best_combo:
+            banks += " "+bank[0]
 
         return f"K dosažení {target} je třeba vyloupit banky {banks} a bude poškozeno jen {best_clients} klientů."
 
