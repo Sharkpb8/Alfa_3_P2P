@@ -3,6 +3,7 @@ import socket
 from src.client import client
 import json
 import time
+from src.error import *
 
 class server:
 
@@ -41,10 +42,8 @@ class server:
         while True:
             try:
                 connection, client_inet_address = self.server_socket.accept()
-                process_client = multiprocessing.Process(target=self.create_new_client,args=(connection,client_inet_address,))
-                process_client.start()
-                process_alive = multiprocessing.Process(target=self.is_alive,args=(connection,client_inet_address,))
-                process_alive.start()
+                process = multiprocessing.Process(target=self.create_new_client,args=(connection,client_inet_address,))
+                process.start()
                 print(f"Client connected on {client_inet_address[0]}")
             except socket.timeout:
                 continue
@@ -54,8 +53,12 @@ class server:
                 break
     
     def create_new_client(self,connection,client_inet_address):
-        c = client(connection,self.server_ip,client_inet_address[0])
-        c.run()
+        try:
+            c = client(connection,self.server_ip,client_inet_address[0])
+            c.run()
+        except ClientAbortError:
+            connection.close()
+            print(f"Client with address {client_inet_address[0]} disconnected")
 
     def readconfig(self,key):
         with open("./Bank/config.json","r") as f:
@@ -87,16 +90,3 @@ class server:
             return True
         else:
             return False
-    
-    def is_alive(self,connection,client_inet_address):
-        timeout = self.readconfig("client_time_out")
-        while True:
-            try:
-                time.sleep(timeout)
-                connection.sendall(b"\x00")
-            except ConnectionAbortedError:
-                break
-            except ConnectionResetError:
-                break
-        connection.close()
-        print(f"Client with address {client_inet_address[0]} disconnected")

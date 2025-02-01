@@ -14,3 +14,5 @@ class AccountRemovalError(Exception):
     pass
 class NotServerIpError(Exception):
     pass
+class ClientAbortError(Exception):
+    pass

@@ -1,4 +1,5 @@
 from src.application import application
+from src.error import *
 
 class client():
 
@@ -61,6 +62,8 @@ class client():
 
         while True:
             chunk = self.connection.recv(256)
+            if(chunk == b''):
+                raise ClientAbortError
             buffer += chunk
             
             if buffer.endswith(b"\r\n"):
