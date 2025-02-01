@@ -24,13 +24,13 @@ class application():
             a = Account(new_account,0)
             self.table_DAO.Save(a)
         except ParametrsError:
-            self.client.send_message("ER Příkaz má mít formát: AC")
+            return "ER Příkaz má mít formát: AC"
         except IndexError:
-            self.client.send_message("ER Již nelze vytvořit účty")
+            return "ER Již nelze vytvořit účty"
         except DatabaseError:
-            self.client.send_message(f"ER Připojení k databázi selhalo")
+            return f"ER Připojení k databázi selhalo"
         else:
-            self.client.send_message(f"AC {new_account}/{self.client.server_ip}")
+            return f"AC {new_account}/{self.client.server_ip}"
 
     @log
     def Account_deposit(self,parametrs):
@@ -46,24 +46,24 @@ class application():
             a.Balance += int(number)
             self.table_DAO.Update(a)
         except ParametrsError:
-            self.client.send_message(f"ER Příkaz má mít formát: AD <account>/<ip> <number>")
+            return f"ER Příkaz má mít formát: AD <account>/<ip> <number>"
         except IpV4Error:
-            self.client.send_message("ER Špatný formát ip addresy")
+            return "ER Špatný formát ip addresy"
         except NotServerIpError:
             response = self.forward_command(account,ip,number,"AD")
             if(not response):
-                return self.client.send_message(f"ER S bankou na {ip} se nepodařilo spojit")
-            self.client.send_message(f"{response}")
+                return f"ER S bankou na {ip} se nepodařilo spojit"
+            return f"{response}"
         except NumberError:
-            self.client.send_message("ER number musí být nezáporný číslo")
+            return "ER number musí být nezáporný číslo"
         except AccountDoestnExistError:
-            self.client.send_message("ER Účet neexistuje")
+            return "ER Účet neexistuje"
         except NumberLimitError:
-            self.client.send_message("ER Částka na účtu nemůže být větší než (2**63)-1")
+            return "ER Částka na účtu nemůže být větší než (2**63)-1"
         except DatabaseError:
-            self.client.send_message(f"ER Připojení k databázi selhalo")
+            return f"ER Připojení k databázi selhalo"
         else:
-            self.client.send_message(f"AD")
+            return f"AD"
     
     @log
     def Account_withdrawal(self,parametrs):
@@ -79,24 +79,24 @@ class application():
             a.Balance -= int(number)
             self.table_DAO.Update(a)
         except ParametrsError:
-            self.client.send_message(f"ER Příkaz má mít formát: AW <account>/<ip> <number>")
+            return f"ER Příkaz má mít formát: AW <account>/<ip> <number>"
         except IpV4Error:
-            self.client.send_message("ER Špatný formát ip addresy")
+            return "ER Špatný formát ip addresy"
         except NotServerIpError:
             response = self.forward_command(account,ip,number,"AW")
             if(not response):
-                return self.client.send_message(f"ER S bankou na {ip} se nepodařilo spojit")
-            self.client.send_message(f"{response}")
+                return f"ER S bankou na {ip} se nepodařilo spojit"
+            return f"{response}"
         except NumberError:
-            self.client.send_message("ER number musí být nezáporný číslo")
+            return "ER number musí být nezáporný číslo"
         except AccountDoestnExistError:
-            self.client.send_message("ER Účet neexistuje")
+            return "ER Účet neexistuje"
         except NegativeBalanceError:
-            self.client.send_message("ER Částka na účtu nemůže být negativní")
+            return "ER Částka na účtu nemůže být negativní"
         except DatabaseError:
-            self.client.send_message(f"ER Připojení k databázi selhalo")
+            return f"ER Připojení k databázi selhalo"
         else:
-            self.client.send_message(f"AW")
+            return f"AW"
 
     @log
     def Account_balance(self,parametrs):
@@ -109,20 +109,20 @@ class application():
             if(balance == None):
                 raise AccountDoestnExistError
         except ParametrsError:
-            self.client.send_message(f"ER Příkaz má mít formát: AB <account>/<ip>")
+            return f"ER Příkaz má mít formát: AB <account>/<ip>"
         except IpV4Error:
-            self.client.send_message("ER Špatný formát ip addresy")
+            return "ER Špatný formát ip addresy"
         except NotServerIpError:
             response = self.forward_command(account,ip,number,"AB")
             if(not response):
-                return self.client.send_message(f"ER S bankou na {ip} se nepodařilo spojit")
-            self.client.send_message(f"{response}")
+                return f"ER S bankou na {ip} se nepodařilo spojit"
+            return f"{response}"
         except AccountDoestnExistError:
-            self.client.send_message("ER Účet neexistuje")
+            return "ER Účet neexistuje"
         except DatabaseError:
-            self.client.send_message(f"ER Připojení k databázi selhalo")
+            return f"ER Připojení k databázi selhalo"
         else:
-            return self.client.send_message(f"AB {balance}")
+            return f"AB {balance}"
 
     @log
     def Account_remove(self,parametrs):
@@ -138,17 +138,17 @@ class application():
                 raise AccountRemovalError
             self.table_DAO.Delete(account)
         except ParametrsError:
-            self.client.send_message(f"ER Příkaz má mít formát: AR <account>/<ip>")
+            return f"ER Příkaz má mít formát: AR <account>/<ip>"
         except IpV4Error:
-            self.client.send_message("ER Špatný formát ip addresy")
+            return "ER Špatný formát ip addresy"
         except AccountDoestnExistError:
-            self.client.send_message("ER Účet neexistuje")
+            return "ER Účet neexistuje"
         except AccountRemovalError:
-            self.client.send_message("ER Účet nelze smazat protože obsahuje zůstatek")
+            return "ER Účet nelze smazat protože obsahuje zůstatek"
         except DatabaseError:
-            self.client.send_message(f"ER Připojení k databázi selhalo")
+            return f"ER Připojení k databázi selhalo"
         else:
-            self.client.send_message(f"AR")
+            return f"AR"
     
     @log
     def Bank_amount(self,parametrs):
@@ -157,11 +157,11 @@ class application():
                 raise ParametrsError
             BA = self.table_DAO.Read_Bank_amount()
         except ParametrsError:
-            self.client.send_message("ER Příkaz má mít formát: BA")
+            return "ER Příkaz má mít formát: BA"
         except DatabaseError:
-                self.client.send_message(f"ER Připojení k databázi selhalo")
+            return f"ER Připojení k databázi selhalo"
         else:
-            self.client.send_message(f"BA {BA}")
+            return f"BA {BA}"
 
     @log
     def Bank_number(self,parametrs):
@@ -170,11 +170,11 @@ class application():
                 raise ParametrsError
             BN = self.table_DAO.Read_Bank_number()
         except ParametrsError:
-            self.client.send_message("ER Příkaz má mít formát: BN")
+            return "ER Příkaz má mít formát: BN"
         except DatabaseError:
-                self.client.send_message(f"ER Připojení k databázi selhalo")
+            return f"ER Připojení k databázi selhalo"
         else:
-            self.client.send_message(f"BN {BN}")
+            return f"BN {BN}"
 
     @log
     def Robbery_plan(self,parametrs):
@@ -188,11 +188,11 @@ class application():
             banks = rp.banks_info(addresses)
             result = rp.best_combination(banks,int(parametrs))
         except ParametrsError:
-            self.client.send_message("ER Příkaz má mít formát: RP <number>")
+            return "ER Příkaz má mít formát: RP <number>"
         except DatabaseError:
-                self.client.send_message(f"ER Připojení k databázi selhalo")
+            return f"ER Připojení k databázi selhalo"
         else:
-            self.client.send_message(result)
+            return result
         
     def Check_parametrs(self,account,ip,number,check_number = True):
         if(check_number):

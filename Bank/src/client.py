@@ -46,13 +46,15 @@ class client():
             pass
         else:
             try:
-                return commands[num][1](split_input[1] if len(split_input) > 1 else None)
+                result = commands[num][1](split_input[1] if len(split_input) > 1 else None)
+                if(result):
+                    self.send_message(result)
             except ConnectionAbortedError:
                 pass
 
     def send_message(self,message,newline = True):
         if(newline):
-            message_as_bytes = bytes(message+"\n\r", "utf-8")
+            message_as_bytes = bytes(f"{message}\n\r", "utf-8")
         else:
             message_as_bytes = bytes(message, "utf-8")
         self.connection.send(message_as_bytes)
