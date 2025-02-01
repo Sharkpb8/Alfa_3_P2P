@@ -5,8 +5,45 @@ import json
 from itertools import combinations
 
 class RobberyPlan():
+    """
+    A class for scanning a network for bank servers and determining the best targets for robbery.
+
+    Attributes
+    ----------
+    ip : str
+        The network identification (subnet) used for scanning.
+    total_processes : int
+        The number of parallel processes used for network scanning.
+    scan_time_out : float
+        The timeout value for each network connection attempt.
+
+    Methods
+    -------
+    scan_network(process_id, addresses)
+        Scans a range of IP addresses in the network for available bank servers.
+    available_servers()
+        Finds available bank servers in the local network.
+    banks_info(addresses)
+        Retrieves information about detected bank servers.
+    best_combination(banks, target)
+        Determines the best combination of banks to rob to meet a target amount.
+    readconfig(key)
+        Reads a configuration value from a JSON file.
+    """
 
     def __init__(self,ip):
+        """
+        Initialises the RobberyPlan with the provided IP address.
+
+        Parameters
+        ----------
+        ip : str
+            The IP address used to determine the subnet for scanning.
+
+        Examples
+        --------
+        >>> rp = RobberyPlan("192.168.1.1")
+        """
         parts = ip.split(".")
         network_identification = f"{parts[0]}.{parts[1]}.{parts[2]}."
         self.ip = network_identification
@@ -20,6 +57,20 @@ class RobberyPlan():
         self.scan_time_out = scan_time_out
 
     def scan_network(self,process_id,addresses):
+        """
+        Scans a range of IP addresses in the network for available bank servers.
+
+        Parameters
+        ----------
+        process_id : int
+            The ID of the scanning process, used to determine the range of addresses to scan.
+        addresses : dict
+            A shared dictionary to store detected servers and their ports.
+
+        Examples
+        --------
+        >>> rp.scan_network(0, {})
+        """
         connections = []
         x_start = (256 * process_id) // self.total_processes
         x_end = (256 * (process_id + 1)) // self.total_processes-1
@@ -45,6 +96,21 @@ class RobberyPlan():
                 i.close()
 
     def available_servers(self):
+        """
+        Finds available bank servers in the local network.
+
+        This method launches multiple processes to scan the network and returns detected servers.
+
+        Returns
+        -------
+        dict
+            A dictionary containing detected servers and their corresponding ports.
+
+        Examples
+        --------
+        >>> rp.available_servers()
+        {10: 65525, 15: 65526}
+        """
         manager = multiprocessing.Manager()
         addresses = manager.dict()
         processes = []
@@ -63,6 +129,24 @@ class RobberyPlan():
         return addresses
     
     def banks_info(self,addresses):
+        """
+        Retrieves information about detected bank servers.
+
+        Parameters
+        ----------
+        addresses : dict
+            A dictionary containing detected servers and their corresponding ports.
+
+        Returns
+        -------
+        list of list
+            A list of banks, each containing IP address, bank amount, and number of clients.
+
+        Examples
+        --------
+        >>> rp.banks_info({10: 65525})
+        [['192.168.1.10', 'BA 100000', 'BN 500']]
+        """
         result = []
         for addr,port in addresses.items():
             try:
@@ -86,6 +170,26 @@ class RobberyPlan():
         return result
 
     def best_combination(self,banks, target):
+        """
+        Determines the best combination of banks to rob to meet a target amount.
+
+        Parameters
+        ----------
+        banks : list of list
+            A list of banks, each containing IP address, bank amount, and number of clients.
+        target : int
+            The target amount of money to be stolen.
+
+        Returns
+        -------
+        str
+            A formatted message with the closest sum to the target and affected banks.
+
+        Examples
+        --------
+        >>> rp.best_combination([['192.168.1.10', 'BA 100000', 'BN 500']], 90000)
+        'RP Nejbližší částka k dosažení 90000 je 100000 a bude třeba vyloupit banky 192.168.1.10 a bude poškozeno 500 klientů.'
+        """
         print(banks)
         best_sum = float('inf')
         best_combo = []
@@ -112,6 +216,24 @@ class RobberyPlan():
         return f"RP Nejbližší částka k dosažení {target} je {best_sum} a bude třeba vyloupit banky {banks} a bude poškozeno {best_clients} klientů."
 
     def readconfig(self,key):
+        """
+        Reads a configuration value from a JSON file.
+
+        Parameters
+        ----------
+        key : str
+            The key whose value needs to be retrieved.
+
+        Returns
+        -------
+        str or None
+            The value associated with the key, or None if an error occurs.
+
+        Examples
+        --------
+        >>> rp.readconfig("scan_processes")
+        10
+        """
         try:
             with open("./Bank/config.json","r") as f:
                 config = json.load(f)
