@@ -43,10 +43,11 @@ class client():
                     choosen_com = None
         except OSError:
             pass
-        except ConnectionAbortedError:
-            pass
         else:
-            return commands[num][1](split_input[1] if len(split_input) > 1 else None)   
+            try:
+                return commands[num][1](split_input[1] if len(split_input) > 1 else None)
+            except ConnectionAbortedError:
+                pass
 
     def send_message(self,message,newline = True):
         if(newline):

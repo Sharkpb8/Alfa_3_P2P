@@ -10,8 +10,14 @@ class RobberyPlan():
         parts = ip.split(".")
         network_identification = f"{parts[0]}.{parts[1]}.{parts[2]}."
         self.ip = network_identification
-        self.total_processes = self.readconfig("scan_processes")
-        self.scan_time_out = self.readconfig("scan_time_out")
+        total_processes = self.readconfig("scan_processes")
+        if(not total_processes or not isinstance(total_processes, int)):
+            total_processes = 10
+        self.total_processes = total_processes
+        scan_time_out = self.readconfig("scan_time_out")
+        if (not scan_time_out or not isinstance(scan_time_out, (int,float))):
+            scan_time_out = 0.1
+        self.scan_time_out = scan_time_out
 
     def scan_network(self,process_id,addresses):
         connections = []
@@ -21,7 +27,6 @@ class RobberyPlan():
             for i in range(65525,65536):
                 for x in range(x_start,x_end):
                     try:
-                        # print(str(ip)+str(x), str(i))
                         server_inet_address = (self.ip+str(x), i)
                         remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         remote_socket.settimeout(self.scan_time_out)
@@ -107,6 +112,16 @@ class RobberyPlan():
         return f"Nejbližší částka k dosažení {target} je {best_sum} a bude třeba vyloupit banky {banks} a bude poškozeno {best_clients} klientů."
 
     def readconfig(self,key):
-        with open("./Bank/config.json","r") as f:
-            config = json.load(f)
-            return config[key]
+        try:
+            with open("./Bank/config.json","r") as f:
+                config = json.load(f)
+                return config.get(key)
+        except FileNotFoundError:
+            print("Error: Config nebyl nalezen.")
+            return None
+        except KeyError:
+            print(f"Error: Klíč: {key} nebyl v configu nalezen.")
+            return None
+        except Exception as e:
+            print(e)
+            return None
