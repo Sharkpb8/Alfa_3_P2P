@@ -18,3 +18,5 @@ create view Bank_number
 as
 select count(account_number)
 from Accounts; //
+
+insert into Accounts(account_number,balance) values(11111,0)
