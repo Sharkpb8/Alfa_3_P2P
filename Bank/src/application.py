@@ -8,12 +8,81 @@ from src.RobberyPlan import RobberyPlan
 from mysql.connector.errors import *
 
 class application():
+    """
+    The Application class manages banking operations such as account creation, deposits, withdrawals, and balance inquiries.
+
+    Attributes
+    ----------
+    client : Client
+        The client associated with the application.
+    table_DAO : AccountDAO
+        Data Access Object for handling account operations.
+
+    Methods
+    -------
+    Account_create(parameters=None)
+        Creates a new bank account with a unique number.
+    Account_deposit(parameters)
+        Deposits an amount into an account.
+    Account_withdrawal(parameters)
+        Withdraws an amount from an account.
+    Account_balance(parameters)
+        Retrieves the balance of a specified account.
+    Account_remove(parameters)
+        Removes an account if it has no remaining balance.
+    Bank_amount(parameters)
+        Retrieves the total balance held by the bank.
+    Bank_number(parameters)
+        Retrieves the number of accounts in the bank.
+    Robbery_plan(parameters)
+        Calculates the best banks to rob to get closest to specific ammount while robbing least clients.
+    Check_parametrs(account, ip, number, check_number=True)
+        Validates account operation parameters.
+    is_invalid_ipv4(ip)
+        Checks whether a given IP address is a valid IPv4 address.
+    parse_parametrs(parameters)
+        Parses input parameters into account number, IP address, and amount.
+    forward_command(account, ip, number, code)
+        Forwards a command to another bank server.
+    """
     def __init__(self,client):
+        """
+        Initialises the application, linking it to a client and setting up database access.
+
+        Parameters
+        ----------
+        client : Client
+            The client instance associated with this application.
+
+        Examples
+        --------
+        >>> app = Application(client)
+        """
         self.client = client
         self.table_DAO = AccountDAO(self)
     
     @log
     def Account_create(self,parametrs = None):
+        """
+        Creates a new bank account with a unique number.
+
+        Parameters
+        ----------
+        parameters : None
+            No parameters should be provided; otherwise, an error is raised.
+
+        Returns
+        -------
+        str
+            A success message with the new account number or an error message.
+
+        Examples
+        --------
+        >>> app.Account_create()
+        'AC 12345/192.168.1.1'
+        >>> app.Account_create("extra")
+        'ER Příkaz má mít formát: AC'
+        """
         try:
             if(parametrs):
                 raise ParametrsError
@@ -34,6 +103,26 @@ class application():
 
     @log
     def Account_deposit(self,parametrs):
+        """
+        Deposits an amount into an account.
+
+        Parameters
+        ----------
+        parameters : str
+            The command format: "AD <account>/<ip> <amount>".
+
+        Returns
+        -------
+        str
+            A success message or an error message.
+
+        Examples
+        --------
+        >>> app.Account_deposit("12345/192.168.1.1 500")
+        'AD'
+        >>> app.Account_deposit("invalid/192.168.1.1 -500")
+        'ER number musí být nezáporný číslo'
+        """
         try:
             account,ip,number = self.parse_parametrs(parametrs)
             self.Check_parametrs(account,ip,number)
@@ -41,6 +130,7 @@ class application():
             a.Balance = self.table_DAO.Read_balance(a.Account_number)
             if(a.Balance == None):
                 raise AccountDoestnExistError
+            # TODO add isdigit() to number
             if((a.Balance+int(number))>(2**63)-1):
                 raise NumberLimitError
             a.Balance += int(number)
@@ -67,6 +157,26 @@ class application():
     
     @log
     def Account_withdrawal(self,parametrs):
+        """
+        Withdraws an amount from an account.
+
+        Parameters
+        ----------
+        parameters : str
+            The command format: "AW <account>/<ip> <amount>".
+
+        Returns
+        -------
+        str
+            A success message or an error message.
+
+        Examples
+        --------
+        >>> app.Account_withdrawal("12345/192.168.1.1 100")
+        'AW'
+        >>> app.Account_withdrawal("12345/192.168.1.1 10000")
+        'ER Částka na účtu nemůže být negativní'
+        """
         try:
             account,ip,number = self.parse_parametrs(parametrs)
             self.Check_parametrs(account,ip,number)
@@ -100,6 +210,26 @@ class application():
 
     @log
     def Account_balance(self,parametrs):
+        """
+        Retrieves the balance of a specified account.
+
+        Parameters
+        ----------
+        parameters : str
+            The command format: "AB <account>/<ip>".
+
+        Returns
+        -------
+        str
+            The account balance or an error message.
+
+        Examples
+        --------
+        >>> app.Account_balance("12345/192.168.1.1")
+        'AB 1500'
+        >>> app.Account_balance("99999/192.168.1.1")
+        'ER Účet neexistuje'
+        """
         try:
             account,ip,number = self.parse_parametrs(parametrs)
             if(number):
@@ -126,6 +256,26 @@ class application():
 
     @log
     def Account_remove(self,parametrs):
+        """
+        Removes an account if it has no remaining balance.
+
+        Parameters
+        ----------
+        parameters : str
+            The command format: "AR <account>/<ip>".
+
+        Returns
+        -------
+        str
+            A success message or an error message.
+
+        Examples
+        --------
+        >>> app.Account_remove("12345/192.168.1.1")
+        'AR'
+        >>> app.Account_remove("67890/192.168.1.1")
+        'ER Účet nelze smazat protože obsahuje zůstatek'
+        """
         try:
             account,ip,number = self.parse_parametrs(parametrs)
             if(number):
@@ -152,6 +302,24 @@ class application():
     
     @log
     def Bank_amount(self,parametrs):
+        """
+        Retrieves the total balance held by the bank.
+
+        Parameters
+        ----------
+        parameters : str
+            Should be None; otherwise, an error is returned.
+
+        Returns
+        -------
+        str
+            The total balance or an error message.
+
+        Examples
+        --------
+        >>> app.Bank_amount()
+        'BA 500000'
+        """
         try:
             if(parametrs):
                 raise ParametrsError
@@ -165,6 +333,24 @@ class application():
 
     @log
     def Bank_number(self,parametrs):
+        """
+        Retrieves the number of accounts in the bank.
+
+        Parameters
+        ----------
+        parameters : str
+            Should be None; otherwise, an error is returned.
+
+        Returns
+        -------
+        str
+            The number of accounts or an error message.
+
+        Examples
+        --------
+        >>> app.Bank_number()
+        'BN 150'
+        """
         try:
             if(parametrs):
                 raise ParametrsError
@@ -178,6 +364,26 @@ class application():
 
     @log
     def Robbery_plan(self,parametrs):
+        """
+        Calculates the best banks to rob to get closest to specific ammount while robbing least clients.
+
+        Parameters
+        ----------
+        parameters : str
+            The amount to be stolen.
+
+        Returns
+        -------
+        str
+            The best robbery plan or an error message.
+
+        Examples
+        --------
+        >>> app.Robbery_plan("10000")
+        'RP Nejbližší částka k dosažení 10000 je 1100 a bude třeba vyloupit banky 192.168.1.19 192.168.1.45 a bude poškozeno 26 klientů.'
+        >>> app.Robbery_plan("invalid")
+        'ER Příkaz má mít formát: RP <number>'
+        """
         try:
             if(not parametrs):
                 raise ParametrsError
@@ -195,6 +401,31 @@ class application():
             return result
         
     def Check_parametrs(self,account,ip,number,check_number = True):
+        """
+        Validates account operation parameters.
+
+        Parameters
+        ----------
+        account : str
+            The account number.
+        ip : str
+            The IP address.
+        number : str or None
+            The transaction amount, if applicable.
+        check_number : bool, optional
+            Whether to validate the transaction amount (default is True).
+
+        Raises
+        ------
+        ParametrsError
+            If required parameters are missing.
+        IpV4Error
+            If the IP address format is incorrect.
+        NotServerIpError
+            If the IP address does not match the server IP.
+        NumberError
+            If the transaction amount is invalid.
+        """
         if(check_number):
             if(not (account and ip and number)):
                 raise ParametrsError
@@ -212,6 +443,26 @@ class application():
                 raise NumberError
 
     def is_invalid_ipv4(self,ip):
+        """
+        Checks whether a given IP address is a valid IPv4 address.
+
+        Parameters
+        ----------
+        ip : str
+            The IP address to validate.
+
+        Returns
+        -------
+        bool
+            True if the IP is invalid, False otherwise.
+
+        Examples
+        --------
+        >>> app.is_invalid_ipv4("192.168.1.1")
+        False
+        >>> app.is_invalid_ipv4("999.999.999.999")
+        True
+        """
         parts = ip.split(".")
         if (len(parts) != 4):
             return True
@@ -228,6 +479,24 @@ class application():
             return False
         
     def parse_parametrs(self,parametrs):
+        """
+        Parses input parameters into account number, IP address, and transaction amount.
+
+        Parameters
+        ----------
+        parameters : str
+            The command input.
+
+        Returns
+        -------
+        tuple
+            A tuple of (account, IP, amount).
+
+        Examples
+        --------
+        >>> app.parse_parametrs("12345/192.168.1.1 500")
+        ('12345', '192.168.1.1', '500')
+        """
         try:
             split_parametrs = parametrs.split("/",maxsplit=1)
             split_split_parametrs = split_parametrs[1].split(maxsplit=1)
@@ -251,6 +520,25 @@ class application():
             return account,ip,number
     
     def forward_command(self,account,ip,number,code):
+        """
+        Forwards a command to another bank server.
+
+        Parameters
+        ----------
+        account : str
+            The account number.
+        ip : str
+            The target server IP.
+        number : str or None
+            The transaction amount, if applicable.
+        code : str
+            The command code.
+
+        Returns
+        -------
+        str or None
+            The server response or None if the connection fails.
+        """
         working_port = None
         try:
             for i in range(65525,65536):
