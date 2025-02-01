@@ -17,20 +17,13 @@ class server:
         timeout = self.readconfig("server_time_out")
         try:
             timeout = float(timeout)
-        except ValueError:
+        except Exception:
             timeout = 5
         port = int(port)
         server_inet_address = (ip, port)
         server_socket = socket.socket()
         server_socket.bind(server_inet_address)
         server_socket.listen()
-        server_socket.settimeout(timeout)
-
-        timeout = self.readconfig("server_time_out")
-        try:
-            timeout = float(timeout)
-        except ValueError:
-            timeout = 5
         server_socket.settimeout(timeout)
 
         self.server_socket = server_socket
@@ -61,22 +54,32 @@ class server:
             print(f"Client with address {client_inet_address[0]} disconnected")
 
     def readconfig(self,key):
-        with open("./Bank/config.json","r") as f:
-            config = json.load(f)
-            return config[key]
+        try:
+            with open("./Bank/config.json","r") as f:
+                config = json.load(f)
+                return config.get(key)
+        except FileNotFoundError:
+            print("Error: Config nebyl nalezen.")
+            return None
+        except KeyError:
+            print(f"Error: Klíč: {key} nebyl v configu nalezen.")
+            return None
+        except Exception as e:
+            print(e)
+            return None
         
     def is_invalid_ipv4(self,ip):
-        parts = ip.split(".")
-        if (len(parts) != 4):
-            return True
         try:
+            parts = ip.split(".")
+            if (len(parts) != 4):
+                return True
             for part in parts:
                 num = int(part)
                 if num < 0 or num > 255:
                     return True
                 if len(part) > 1 and part[0] == "0":
                     return True
-        except ValueError:
+        except Exception:
             return True
         else:
             return False
