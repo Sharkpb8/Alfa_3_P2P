@@ -2,3 +2,6 @@ __pycache__
 venv
 appconfig.json
 application.log
+build
+dist
+main.spec
