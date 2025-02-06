@@ -59,7 +59,7 @@ The P2P Bank System simulates the operation of a bank that communicates with oth
    - **BN**: Displays the number of clients in the bank.
    - **RP**: Generates a robbery plan to reach a specified target balance while minimizing the number of affected clients.
 
-| Název                        | Kód | Volání                                      | Odpověď při úspěchu         | Odpověď při chybě      |
+| Name                        | Code | Call                                      | Successfull response         | Error response      |
 |------------------------------|-----|---------------------------------------------|-----------------------------|------------------------|
 | Bank code                    | BC  | `BC`                                          | `BC <ip>`                     | `ER <message>` <message>           |
 | Account create                | AC  | `AC`                                          | `AC <account>/<ip>`           | `ER <message>` <message>           |
