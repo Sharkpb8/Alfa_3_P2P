@@ -1,8 +1,9 @@
 {
-    "ip":"192.168.69.241",
+    "ip":"10.147.18.244",
     "port":65530,
     "server_time_out":5,
     "client_time_out":5,
     "scan_processes":10,
-    "scan_time_out":0.1
+    "forward_scan_time_out":1,
+    "rp_scan_time_out":0.1
 }

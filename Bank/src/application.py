@@ -6,6 +6,7 @@ from src.error import *
 import socket
 from src.RobberyPlan import RobberyPlan
 from mysql.connector.errors import *
+import json
 
 class application():
     """
@@ -60,6 +61,30 @@ class application():
         """
         self.client = client
         self.table_DAO = AccountDAO(self)
+
+    def Bank_Code(self,parametrs):
+        """
+        Returns the bank code (server IP address) or an error message if incorrect parameters are provided.
+
+        Parameters
+        ----------
+        parameters : str, optional
+            Additional parameters (should be None).
+
+        Examples
+        --------
+        >>> client.Bank_Code()
+        BC 192.168.1.1
+        >>> client.Bank_Code("extra")
+        ER Příkaz má mít formát: BC
+        """
+        try:
+            if(parametrs):
+                    raise ParametrsError
+        except ParametrsError:
+            return "ER Příkaz má mít formát: BC"
+        else:
+            return f"BC {self.client.server_ip}"
     
     @log
     def Account_create(self,parametrs = None):
@@ -545,7 +570,11 @@ class application():
                 try:
                     server_inet_address = (ip, i)
                     remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    remote_socket.settimeout(0.1)
+                    try:
+                        timeout = float(self.readconfig("forward_scan_time_out"))
+                    except Exception:
+                        timeout = 5
+                    remote_socket.settimeout(timeout)
                     remote_socket.connect(server_inet_address)
                     working_port = i
                     remote_socket.close()
@@ -567,4 +596,37 @@ class application():
             response = remote_socket.recv(4096).decode().strip()
             remote_socket.close()
             return response
+        
+    def readconfig(self,key):
+        """
+        Reads a configuration value from a JSON file.
+
+        Parameters
+        ----------
+        key : str
+            The key whose value needs to be retrieved.
+
+        Returns
+        -------
+        str or None
+            The value associated with the key, or None if an error occurs.
+
+        Examples
+        --------
+        >>> server.readconfig("ip")
+        '192.168.1.1'
+        """
+        try:
+            with open("./Bank/config.json","r") as f:
+                config = json.load(f)
+                return config.get(key)
+        except FileNotFoundError:
+            print("Error: Config nebyl nalezen.")
+            return None
+        except KeyError:
+            print(f"Error: Klíč: {key} nebyl v configu nalezen.")
+            return None
+        except Exception as e:
+            print(e)
+            return None
                 

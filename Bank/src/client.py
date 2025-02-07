@@ -159,24 +159,3 @@ class client():
             if buffer.endswith(b"\r\n"):
                 message = buffer.decode("utf-8")
                 return message.strip()
-            
-    def Bank_Code(self,parametrs = None):
-        """
-        Returns the bank code (server IP address) or an error message if incorrect parameters are provided.
-
-        Parameters
-        ----------
-        parameters : str, optional
-            Additional parameters (should be None).
-
-        Examples
-        --------
-        >>> client.Bank_Code()
-        BC 192.168.1.1
-        >>> client.Bank_Code("extra")
-        ER Příkaz má mít formát: BC
-        """
-        if not parametrs:
-            self.send_message(f"BC {self.server_ip}")
-        else:
-            self.send_message("ER Příkaz má mít formát: BC")

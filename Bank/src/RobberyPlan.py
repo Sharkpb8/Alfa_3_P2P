@@ -51,7 +51,7 @@ class RobberyPlan():
         if(not total_processes or not isinstance(total_processes, int)):
             total_processes = 10
         self.total_processes = total_processes
-        scan_time_out = self.readconfig("scan_time_out")
+        scan_time_out = self.readconfig("rp_scan_time_out")
         if (not scan_time_out or not isinstance(scan_time_out, (int,float))):
             scan_time_out = 0.1
         self.scan_time_out = scan_time_out
