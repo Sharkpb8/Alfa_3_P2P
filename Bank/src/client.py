@@ -69,7 +69,7 @@ class client():
         If an invalid command is given, an error message is sent back.
         """
         commands = [
-            ("BC",self.Bank_Code),
+            ("BC",self.application.Bank_Code),
             ("AC",self.application.Account_create),
             ("AD",self.application.Account_deposit),
             ("AW",self.application.Account_withdrawal),
