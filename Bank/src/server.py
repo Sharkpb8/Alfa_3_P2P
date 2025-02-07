@@ -47,7 +47,7 @@ class server:
         port = self.readconfig("port")
         if(self.is_invalid_port(port)):
             port = "65525"
-        timeout = self.readconfig("server_time_out")
+        timeout = self.readconfig("client_time_out")
         try:
             timeout = float(timeout)
         except Exception:
