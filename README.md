@@ -33,14 +33,34 @@ Configurations are set in `config.json`:
 - **Network Configuration**:
   - `host`: The IP address the server listens on.
   - `port`: The port the server listens on, configurable between 65525 and 65535.
-  - `timeout`: The timeout for client listening, in s (e.g., 5).
-  - `client_time_out`: The timeout for client in s (e.g. 5).
+  - `client_time_out`: The timeout for client being inactive in s (e.g. 5).
   - `scan_processes`: Number of processes used to scan network (e.g. 10).
-  - `scan_time_out`: Time out used in scaning network.
+  - `forward_scan_time_out`: Time out used in scaning ports in forward.
+  - `rp_scan_time_out`: Time out used in scaning network.
 
   
 Refer to `config.json` for valid configurations.
 
+## Configuration Options
+Database configuration is in `appconfig.json`:
+- **Network Configuration**:
+  - `host`: Ip address of the DB server.
+  - `port`: Port address of the DB server.
+  - `user`: Username for your connection to your DB server.
+  - `password`: Password for your connection to your DB server.
+  - `database`: Name of your database.
+- Example of `appconfig.json`:
+```json
+{
+    "database":{
+        "host":"ip",
+        "port":port,
+        "user":"username",
+        "password":"password",
+        "database":"DatabaseName"
+    }
+}
+```
 
 ## Documentation and Reporting
 
