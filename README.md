@@ -109,5 +109,8 @@ The P2P Bank System simulates the operation of a bank that communicates with oth
    ```bash
    python.exe -m venv venv
    ./venv/Scripts/pip.exe install -r requirements.txt
-4. Run `main.py`
-5. Connect using putty with connection type raw on the same ip and port as the server.
+4. In powershell navigate to Alfa_3_P2P
+5. Paste this command to activate:
+   ```bash
+   & disk:/path/to/project/Alfa_3_P2P/venv/Scripts/python.exe disk:/path/to/project/Alfa_3_P2P/Bank/main.py
+6. Connect using putty with connection type raw on the same ip and port as the server.
