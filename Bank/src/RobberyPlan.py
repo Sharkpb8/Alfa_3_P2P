@@ -160,11 +160,23 @@ class RobberyPlan():
                 BA = f"BA\r\n"
                 remote_socket.sendall(BA.encode("utf-8"))
                 BA_response = remote_socket.recv(4096).decode().strip()
-                data.append(BA_response)
+                try:
+                    if(not BA_response.split(maxsplit=1)[1].isdigit):
+                        raise Exception
+                except Exception:
+                    pass
+                else:
+                    data.append(BA_response)
                 BN = f"BN\r\n"
                 remote_socket.sendall(BN.encode("utf-8"))
                 BN_response = remote_socket.recv(4096).decode().strip()
-                data.append(BN_response)
+                try:
+                    if(not BN_response.split(maxsplit=1)[1].isdigit):
+                        raise Exception
+                except Exception:
+                    pass
+                else:
+                    data.append(BN_response)
                 result.append(data)
                 remote_socket.close()
         return result
