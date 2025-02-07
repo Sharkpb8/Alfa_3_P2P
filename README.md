@@ -91,6 +91,9 @@ The P2P Bank System simulates the operation of a bank that communicates with oth
 - Tomáš Križko
 - Ondra Kábrt
 
+### Reused code
+- [Alfa_2](https://github.com/Sharkpb8/Alfa_2_Database)
+
 ## Installation and Execution
 
 ### Dependencies
