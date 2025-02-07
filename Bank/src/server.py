@@ -2,8 +2,8 @@ import multiprocessing.process
 import socket
 from src.client import client
 import json
-import time
 from src.error import *
+import traceback
 
 class server:
     """
@@ -54,8 +54,9 @@ class server:
         except Exception:
             timeout = 5
         port = int(port)
+        print("".join(traceback.format_stack()))
         server_inet_address = (ip, port)
-        server_socket = socket.socket()
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(server_inet_address)
         server_socket.listen()
         server_socket.settimeout(timeout)
@@ -107,11 +108,12 @@ class server:
         After client loop ends: Client with address 192.168.1.10 disconnected
         """
         try:
-            c = client(connection,self.server_ip,client_inet_address[0])
+            c = client(connection,"192.168.69.200",client_inet_address[0])
             c.run()
         except ClientAbortError:
-            connection.close()
             print(f"Client with address {client_inet_address[0]} disconnected")
+        finally:
+            connection.close()
 
     def readconfig(self,key):
         """
