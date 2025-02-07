@@ -52,12 +52,12 @@ class server:
             timeout = float(timeout)
         except Exception:
             timeout = 5
+        self.timeout = timeout
         port = int(port)
         server_inet_address = (ip, port)
         server_socket = socket.socket()
         server_socket.bind(server_inet_address)
         server_socket.listen()
-        server_socket.settimeout(timeout)
 
         self.server_socket = server_socket
         self.server_ip = ip
@@ -82,12 +82,12 @@ class server:
                 process = multiprocessing.Process(target=self.create_new_client,args=(connection,client_inet_address,))
                 process.start()
                 print(f"Client connected on {client_inet_address[0]}")
-            except socket.timeout:
-                continue
             except OSError:
                 break
             except ConnectionAbortedError:
                 break
+            except Exception as e:
+                print(e)
     
     def create_new_client(self,connection,client_inet_address):
         """
@@ -106,11 +106,14 @@ class server:
         After client loop ends: Client with address 192.168.1.10 disconnected
         """
         try:
-            c = client(connection,self.server_ip,client_inet_address[0])
+            c = client(connection,self.server_ip,client_inet_address[0],self.timeout)
             c.run()
         except ClientAbortError:
-            print(f"Client with address {client_inet_address[0]} disconnected")
+            pass
+        except Exception as e:
+            print(e)
         finally:
+            print(f"Client with address {client_inet_address[0]} disconnected")
             connection.close()
 
     def readconfig(self,key):

@@ -30,7 +30,7 @@ class client():
         Returns the bank code (server IP address) or an error message if incorrect parameters are provided.
     """
 
-    def __init__(self,connection,server_ip,client_ip):
+    def __init__(self,connection,server_ip,client_ip,timeout):
         """
         Initialises the client with a connection to the server and prepares the application module.
 
@@ -51,6 +51,7 @@ class client():
         self.application = application(self)
         self.server_ip = server_ip
         self.client_ip = client_ip
+        self.timeout = timeout
 
     def run(self):
         """
@@ -149,13 +150,16 @@ class client():
         'BC'
         """
         buffer = b""
-
-        while True:
-            chunk = self.connection.recv(256)
-            if(chunk == b''):
-                raise ClientAbortError
-            buffer += chunk
-            
-            if buffer.endswith(b"\r\n"):
-                message = buffer.decode("utf-8")
-                return message.strip()
+        try:
+            self.connection.settimeout(self.timeout)
+            while True:
+                chunk = self.connection.recv(256)
+                if(chunk == b''):
+                    raise ClientAbortError
+                buffer += chunk
+                
+                if buffer.endswith(b"\r\n"):
+                    message = buffer.decode("utf-8")
+                    return message.strip()
+        except TimeoutError:
+            raise ClientAbortError

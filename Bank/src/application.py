@@ -62,6 +62,7 @@ class application():
         self.client = client
         self.table_DAO = AccountDAO(self)
 
+    @log
     def Bank_Code(self,parametrs):
         """
         Returns the bank code (server IP address) or an error message if incorrect parameters are provided.
