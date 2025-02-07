@@ -29,6 +29,7 @@ This P2P Bank System is a python program that simulates a peer-to-peer network o
 
 
 ## Configuration Options
+### Config
 Configurations are set in `config.json`:
 - **Network Configuration**:
   - `host`: The IP address the server listens on.
@@ -41,7 +42,7 @@ Configurations are set in `config.json`:
   
 Refer to `config.json` for valid configurations.
 
-## Configuration Options
+### Database Config
 Database configuration is in `appconfig.json`:
 - **Network Configuration**:
   - `host`: Ip address of the DB server.
